@@ -1,0 +1,13 @@
+numSerieRecurso,identificacaoRecurso,modeloRecurso,patrimonioRecurso,codStatus,codSubCategoria,codUnidade
+NS2435T2,"RECURSO1 Teste2","SR i5",123430,7,1,3
+NS345RT2,"RECURSO2 Teste2",S46C,123431,6,1,3
+NS43567C,"RECURSO1 Teste1","ASUS i7",112420,6,1,2
+NS5678T2,"RECURSO5 Teste2","Lab. de Informática",123434,6,8,3
+NSR000T1,"RECURSO6 Teste1","Lab. de Informática",112425,6,8,2
+NSR3453T1,"RECURSO5 Teste1","Lab. de Informática",112424,6,8,2
+NSR3456T2,"RECURSO3 Teste2","Semp Toshiba",123432,6,2,3
+NSR345T1,"RECURSO4 Teste1","MAC i3",112423,6,2,2
+NSR3498T2,"RECURSO4 Teste2","STI Core 2D",123433,6,2,3
+NSR35687T,"RECURSO2 Teste1","Sony Vayo Sx",112422,6,2,2
+NSR3678T2,"RECURSO6 Teste2","Lab. de Informática",123435,6,8,3
+NSR4567R,"RECURSO3 Teste1","Lenovo Si",112421,6,1,2

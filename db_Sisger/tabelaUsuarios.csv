@@ -1,0 +1,8 @@
+codUsuario,cpfUsuario,dataNascimentoUsuario,emailUsuario,loginUsuario,nomeUsuario,senhaUsuario,telefoneUsuario,FUNCAOUSUARIO_codFuncaoUsuario,STATUS_codStatus,UNIDADES_codUnidade
+1,907.397.278-77,"1976-11-19 00:00:00",sisgersuporte@gmail.com,gestor,"Cosme Daiel",25d55ad283aa400af464c76d713c07ad,(31)8655-2992,1,1,1
+3,218.722.345-00,"2015-03-01 00:00:00",sisgersuporte@gmail.com,adminteste1,"Administrador Teste1",25d55ad283aa400af464c76d713c07ad,(31)4777-8798,2,1,2
+4,153.626.847-01,"2015-04-05 00:00:00",sisgersuporte@gmail.com,peofessorteste2,"Professor Teste2",25d55ad283aa400af464c76d713c07ad,(31)4546-5647,4,1,3
+5,232.174.883-42,"2015-04-05 00:00:00",sisgersuporte@gmail.com,alunoteste2,"Aluno Teste2",25d55ad283aa400af464c76d713c07ad,(31)5363-6365,5,1,3
+6,666.887.122-45,"1976-11-18 21:00:00",sisgersuporte@gmail.com,professorteste1,"Professor Teste1",25d55ad283aa400af464c76d713c07ad,(31)5365-4654,4,1,2
+7,344.438.135-27,"1975-04-11 21:00:00",sisgersuporte@gmail.com,alunoteste1,"Aluno Teste1",25d55ad283aa400af464c76d713c07ad,(31)5646-4765,5,1,2
+8,412.863.428-05,"2014-05-11 21:00:00",sisgersuporte@gmail.com,adminteste2,"Administrador Teste2",25d55ad283aa400af464c76d713c07ad,(31)5436-5474,2,1,3
