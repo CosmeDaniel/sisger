@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN" 
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+
+	<session-factory>
+
+		<!-- Configurações de Conexão -->
+		<property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+		<property name="connection.url">jdbc:mysql://localhost:3306/db_sisger</property>
+		<property name="connection.username">root</property>
+		<property name="connection.password">952748</property>
+
+		<!-- Pool de Conexão JDBC - (Quantidade de conexões criadas) -->
+		<property name="connection.pool_size">1</property>
+
+		<!-- Dialeto SQL -->
+		<property name="dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
+
+		<!-- Gerenciamento da Sessão -->
+		<property name="current_session_context_class">thread</property>
+
+		<!-- Desabilitar a Cache -->
+		<property name="cache.provider_class">org.hibernate.cache.internal.NoCacheProvider</property>
+
+		<!-- Exibe os Comandos SQL -->
+		<property name="show_sql">true</property>
+
+		<!-- Criar as Tabelas -->
+		<property name="hbm2ddl.auto">validate</property>
+		
+		<!-- Mapeando as Classes para o Hibernate gerar as Tabelas-->
+		<mapping class="br.com.sisger.modelo.Estado"/>
+		<mapping class="br.com.sisger.modelo.Categoria"/>
+		<mapping class="br.com.sisger.modelo.Status"/>
+		<mapping class="br.com.sisger.modelo.FuncaoUsuario"/>
+		<mapping class="br.com.sisger.modelo.Cidade"/>
+		<mapping class="br.com.sisger.modelo.Endereco"/>
+		<mapping class="br.com.sisger.modelo.SubCategoria"/>		
+		<mapping class="br.com.sisger.modelo.Unidade"/>
+		<mapping class="br.com.sisger.modelo.Usuario"/>	
+		<mapping class="br.com.sisger.modelo.Reserva"/>
+		<mapping class="br.com.sisger.modelo.Recurso"/>			
+				
+	</session-factory>
+
+</hibernate-configuration>
