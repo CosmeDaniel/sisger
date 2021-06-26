@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition template="/templates/layoutGeral.xhtml">
+
+	<ui:define name="metadata">
+		<f:metadata>
+			<f:event listener="#{cidadeBean.carregarPesquisa}" type="preRenderView" />
+			<f:event listener="#{cidadeBean.carregarCadastro}" type="preRenderView" />
+			<f:event listener="#{usuarioBean.verificaFuncaoUsuario}" type="preRenderView" />
+
+			<f:viewParam name="cidcod" value="#{cidadeBean.codigo}" />
+			<f:viewParam name="cidacao" value="#{cidadeBean.acao}" />
+			<f:viewParam name="estcod" value="#{estadoBean.codigo}" />
+			<f:viewParam name="estacao" value="#{estadoBBean.acao}" />
+		</f:metadata>
+	</ui:define>
+
+	<ui:define name="conteudo">
+
+		<p:dialog id="dlgCidaMostrar" header="Cadastro de Cidades:"
+			widgetVar="dlgCidMostrar" resizable="false" modal="true"
+			appendTo="@(body)" showEffect="fade" hideEffect="fade" visible="true"
+			draggable="false" closable="false">
+
+			<p:separator />
+
+			<h:form id="frmDlgCidCad">
+				<h:panelGrid id="pnlCidade" columns="6">
+					<p:outputLabel for="txtCodCidade" value="Código:" />
+					<p:inputText id="txtCodCidade" size="10"
+						value="#{cidadeBean.cidadeCadastro.codCidade}" readonly="true">
+						<f:validateBean />
+					</p:inputText>
+				</h:panelGrid>
+
+				<h:panelGrid id="pnlCidade1" columns="6">
+					<p:outputLabel for="txtNomeCidade" value="Cidade:" />
+					<p:inputText id="txtNomeCidade" size="44"
+						value="#{cidadeBean.cidadeCadastro.nomeCidade}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:outputLabel value="Estado:" />
+					<p:selectOneMenu id="slcCidEstCad" value="#{cidadeBean.cidadeCadastro.estado}"
+						converter="estadoConverter" filter="true">
+						<f:selectItem itemValue="" itemLabel="Estado:" />
+						<f:selectItems value="#{cidadeBean.listaEstados}"
+							var="listaEstados" itemValue="#{listaEstados}"
+							itemLabel="#{listaEstados.ufEstado}" />
+						<f:validateBean />
+					</p:selectOneMenu>
+
+					<p:commandButton id="btnSalvar" value="Salvar" widgetVar="botaoSalvar"
+						actionListener="#{cidadeBean.salvar}" update=":msgAviso
+						:frmDlgCidCad :frmDlgCidCad:tblCidCad" />
+
+					<p:button value="Sair" onclick="PF('dlgCidMostrar').hide();"
+						outcome="/paginas/homerPrincipal.xhtml"/>
+				</h:panelGrid>
+
+				<p:dataTable id="tblCidCad" widgetVar="tblCidadeCadastro"
+					value="#{cidadeBean.listaCidades}" var="listaCidadesFiltradas"
+					filteredValue="#{cidadeBean.listaCidadesFiltradas}" rows="7"
+					emptyMessage="Nenhum registro Encontrado!" paginator="true"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks}
+						{NextPageLink} {LastPageLink} {Exporters}"
+					style="max-width: 630px; min-width: 630px">
+					
+				<f:facet name="{Exporters}">
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="pdf.png" width="24" title="Emitir Relatórios em PDF"/>
+						<p:dataExporter preProcessor="true" type="pdf" target="tblCidCad"
+							fileName="RelatórioDeCidades" encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="excel.png" width="24" title="Emitir Relatórios em EXCEL"/>
+						<p:dataExporter preProcessor="true" type="xls" target="tblCidCad"
+							fileName="RelatórioDeCidades" encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="xml.png" width="24" title="Emitir Relatórios em XLM"/>
+						<p:dataExporter preProcessor="true" type="xml" target="tblCidCad"
+							fileName="RelatórioDeCidades" encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="csv.png" width="24" title="Emitir Relatórios em CSV"/>
+						<p:dataExporter preProcessor="true" type="csv" target="tblCidCad"
+							fileName="RelatórioDeCidades" encoding="ISO-8859-1"/>
+					</h:commandLink>
+				</f:facet>	
+
+					<p:column headerText="Código" width="13%"
+						filterBy="#{listaCidadesFiltradas.codCidade}"
+						sortBy="#{listaCidadesFiltradas.codCidade}">
+						<h:outputText value="#{listaCidadesFiltradas.codCidade}" />
+					</p:column>
+
+					<p:column headerText="Nome Cidade" width="20%"
+						filterBy="#{listaCidadesFiltradas.nomeCidade}"
+						sortBy="#{listaCidadesFiltradas.nomeCidade}">
+						<h:outputText value="#{listaCidadesFiltradas.nomeCidade}" />
+					</p:column>
+
+					<p:column headerText="Estado" width="15%"
+						filterBy="#{listaCidadesFiltradas.estado.ufEstado}"
+						sortBy="#{listaCidadesFiltradas.estado.ufEstado}">
+						<h:outputText value="#{listaCidadesFiltradas.estado.ufEstado}" />
+					</p:column>
+
+					<p:column headerText="Opções" width="8%" exportable="false">
+						<p:commandButton icon="ui-icon-pencil" title="Editar Cidade"
+							oncomplete="PF('dlgCidEditar').show();"
+							actionListener="#{cidadeBean.carregarCadastro}"
+							update=":frmDlgCidEdi:pnlCidade :frmDlgCidEdi:pnlCidadeEdi1">
+							<f:param name="codCidade" value="#{listaCidadesFiltradas.codCidade}" />
+							<f:setPropertyActionListener target="#{cidadeBean.cidadeCadastro}"
+								value="#{listaCidadesFiltradas}" />
+						</p:commandButton>
+
+						<p:commandButton icon="ui-icon-trash" title="Excluir Cidade"
+							oncomplete="PF('dlgCidExcluir').show();"
+							actionListener="#{cidadeBean.carregarCadastro}"
+							update=":frmDlgCidExc:pnlCidadeExc :frmDlgCidExc:pnlCidadeExc1"
+							rendered="#{autenticacaoBean.usuarioAutenticado.unidade.unidade == null}">
+							<f:param name="codCidade" value="#{listaCidadesFiltradas.codCidade}" />
+							<f:setPropertyActionListener target="#{cidadeBean.cidadeCadastro}"
+								value="#{listaCidadesFiltradas}" />
+						</p:commandButton>
+					</p:column>
+				</p:dataTable>
+
+			</h:form>
+		</p:dialog>
+
+		<p:dialog id="dlgCidaEditar" header="Editar Cidade:"
+			widgetVar="dlgCidEditar" resizable="false" modal="true"
+			appendTo="@(body)" showEffect="fade" hideEffect="fade"
+			closable="false">
+
+			<p:separator />
+
+			<h:form id="frmDlgCidEdi">
+				<h:panelGrid id="pnlCidade" columns="6">
+					<p:outputLabel for="txtCodCidade" value="Código:" />
+					<p:inputText id="txtCodCidade" size="10"
+						value="#{cidadeBean.cidadeCadastro.codCidade}" readonly="true" />
+				</h:panelGrid>
+
+				<h:panelGrid id="pnlCidadeEdi1" columns="6">
+					<p:outputLabel for="txtNomeCidade" value="Cidade:" />
+					<p:inputText id="txtNomeCidade" size="44"
+						value="#{cidadeBean.cidadeCadastro.nomeCidade}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:outputLabel value="Estado:" />
+					<p:selectOneMenu id="slcCidEstCad"
+						value="#{cidadeBean.cidadeCadastro.estado}"
+						converter="estadoConverter" filter="true">
+						<f:selectItem itemValue="" itemLabel="Estado:" />
+						<f:selectItems value="#{cidadeBean.listaEstados}"
+							var="listaEstados" itemValue="#{listaEstados}"
+							itemLabel="#{listaEstados.ufEstado}" />
+						<f:validateBean />
+					</p:selectOneMenu>
+
+					<p:commandButton value="Editar" actionListener="#{cidadeBean.editar}"
+						update=":msgAviso :frmDlgCidCad:tblCidCad"
+						oncomplete="PF('dlgCidEditar').hide();" />
+						
+					<p:commandButton value="Sair"
+						oncomplete="PF('dlgCidEditar').hide(); PF('dlgCidMostrar').show();">
+						<p:resetInput target="pnlCidade" />
+					</p:commandButton>
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog id="dlgCidaExcluir" header="Excluir Cidade:"
+			widgetVar="dlgCidExcluir" resizable="false" modal="true"
+			appendTo="@(body)" showEffect="fade" hideEffect="fade"
+			closable="false">
+
+			<p:separator />
+
+			<h:form id="frmDlgCidExc">
+				<h:panelGrid id="pnlCidadeExc" columns="6">
+					<p:outputLabel for="txtCodCidadeExc" value="Código:" />
+					<p:inputText id="txtCodCidadeExc" size="10"
+						value="#{cidadeBean.cidadeCadastro.codCidade}" readonly="true" />
+				</h:panelGrid>
+
+				<h:panelGrid id="pnlCidadeExc1" columns="6">
+					<p:outputLabel for="txtNomeCidadeExc" value="Cidade:" />
+					<p:inputText id="txtNomeCidadeExc" size="44"
+						value="#{cidadeBean.cidadeCadastro.nomeCidade}" readonly="true">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:outputLabel value="Estado:" />
+					<p:selectOneMenu id="slcCidEstCad" value="#{cidadeBean.cidadeCadastro.estado}"
+						converter="estadoConverter" filter="true">
+						<f:selectItem itemValue="" itemLabel="Estado:" />
+						<f:selectItems value="#{cidadeBean.listaEstados}"
+							var="listaEstados" itemValue="#{listaEstados}"
+							itemLabel="#{listaEstados.ufEstado}"/>
+						<f:validateBean />
+					</p:selectOneMenu>
+
+					<p:commandButton value="Excluir"
+						actionListener="#{cidadeBean.excluir}"
+						update=":msgAviso :frmDlgCidCad:tblCidCad"
+						oncomplete="PF('dlgCidExcluir').hide();" />
+						
+					<p:commandButton value="Sair"
+						oncomplete="PF('dlgCidExcluir').hide(); PF('dlgCidMostrar').show();">
+						<p:resetInput target="pnlCidade" />
+					</p:commandButton>
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+	</ui:define>
+</ui:composition>
+</html>

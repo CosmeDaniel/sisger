@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+	id="WebApp_ID" version="3.1">
+
+	<!-- Nome da Aplicação -->
+	<display-name>Sisger</display-name>
+
+	<!-- Arquivo Pricipal da Aplicação -->
+	<welcome-file-list>
+		<welcome-file>paginas/principal.xhtml</welcome-file>
+	</welcome-file-list>
+
+	<!-- Configuração do Servlet do JSF -->
+	<servlet>
+		<servlet-name>Faces Servlet</servlet-name>
+		<servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Faces Servlet</servlet-name>
+		<url-pattern>*.xhtml</url-pattern>
+	</servlet-mapping>
+
+<!-- Altera o Tema da Aplicação  -->
+	<context-param>  
+        <param-name>primefaces.THEME</param-name>  
+        <param-value>#{preferenciaThemas.thema}</param-value>   
+	</context-param>
+     
+	<!-- Carregando o Contexto de Sessões do Hibernate -->
+	<listener>
+		<listener-class>br.com.sisger.controle.FabricaSessao</listener-class>
+	</listener>
+
+
+</web-app>

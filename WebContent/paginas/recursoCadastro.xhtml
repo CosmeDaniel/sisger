@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition template="/templates/layoutGeral.xhtml">
+
+	<ui:define name="metadata">
+		<f:metadata>
+			<f:event listener="#{recursoBean.carregarPesquisa}"	type="preRenderView" />
+			<f:event listener="#{recursoBean.carregarCadastro}"	type="preRenderView" />
+			<f:event listener="#{usuarioBean.verificaFuncaoUsuario}" type="preRenderView" />
+			<f:event listener="#{usuarioBean.verificaFuncaoUsuario}" type="preRenderView" />
+
+			<f:viewParam name="reccod" value="#{recursoBean.codigo}" />
+			<f:viewParam name="recacao" value="#{recursoBean.acao}" />
+			<f:viewParam name="stacod" value="#{statusBean.codigo}" />
+			<f:viewParam name="statcao" value="#{statusBean.acao}" />
+			<f:viewParam name="subcod" value="#{subCategoriaBean.codigo}" />
+			<f:viewParam name="subCcao" value="#{subCategoriaBean.acao}" />
+
+		</f:metadata>
+	</ui:define>
+
+	<ui:define name="conteudo">
+
+		<p:dialog id="dlgRecuMostrar" header="Cadastro de Recursos:"
+			widgetVar="dlgRecMostrar" resizable="false" modal="true"
+			appendTo="@(body)" showEffect="fade" hideEffect="fade" visible="true"
+			draggable="false" closable="false" >
+
+			<h:form id="frmDlgRecCad">
+				<h:panelGrid id="pngRecCad">
+					<h:outputText value="Unidade: #{autenticacaoBean.usuarioAutenticado.unidade.razaoSocialUnidade}" />
+				</h:panelGrid>
+
+				<p:separator />
+
+				<h:panelGrid id="pnlRecurso" columns="6">
+					<p:outputLabel for="txtnumSerieRecurso" value="Nº. Série:" />
+					<p:inputText id="txtnumSerieRecurso" size="20"
+						title="Número de Série do Recurso - (Caso não exista é permitidos valores aleatórios.)"
+						value="#{recursoBean.recursoCadastro.numSerieRecurso}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:outputLabel for="txtPatrimonioRecurso" value="Patrimônio:" />
+					<p:inputText id="txtPatrimonioRecurso" size="20"
+						title="Número de Patrimônio do Recurso - (Caso não exista é permitidos valores aleatórios.)"
+						value="#{recursoBean.recursoCadastro.patrimonioRecurso}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:outputLabel for="txtIndentificacaoRecurso" value="Recurso:" />
+					<p:inputText id="txtIndentificacaoRecurso" size="59"
+						title="Nome do Recurso(Computador Lenovo, Televisor SONY EX, Microfone sem Fio)"
+						value="#{recursoBean.recursoCadastro.identificacaoRecurso}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:outputLabel for="txtModeloRecurso" value="Modelo:" />
+					<p:inputText id="txtModeloRecurso" size="35" title="Modelo do Recurso"
+						value="#{recursoBean.recursoCadastro.modeloRecurso}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:outputLabel value="Subcategoria:" title="Qual é a Subcategoria do Recurso" />
+					<p:selectOneMenu id="slcRecSubCad"
+						value="#{recursoBean.recursoCadastro.subCategoria}"
+						converter="subCategoriaConverter" filter="true">
+						<f:selectItem itemValue="" itemLabel="Selecione:" />
+						<f:selectItems value="#{recursoBean.listaSubCategorias}"
+							var="listaSubCategorias" itemValue="#{listaSubCategorias}"
+							itemLabel="#{listaSubCategorias.nomeSubCategoria}" />
+						<f:validateBean />
+					</p:selectOneMenu>
+
+					<p:outputLabel value="Status:" />
+					<p:selectOneMenu id="slcRecStaCad"
+						value="#{recursoBean.recursoCadastro.status}"
+						converter="statusConverter" filter="true">
+						<f:selectItems value="#{recursoBean.listaStatus}"
+							var="listaStatus" itemValue="#{listaStatus}"
+							itemLabel="#{listaStatus.nomeStatus}" />
+						<f:validateBean />
+					</p:selectOneMenu>
+
+					<p:commandButton id="btnSalvar" value="Salvar"
+						widgetVar="botaoSalvar" actionListener="#{recursoBean.salvar}"
+						update=":msgAviso :frmDlgRecCad:tblRecCad :frmDlgRecCad"/>
+
+					<p:button value="Sair" onclick="PF('dlgRecMostrar').hide();"
+						outcome="/paginas/homerPrincipal.xhtml"/>
+				</h:panelGrid>
+
+				<p:separator />
+
+				<p:dataTable id="tblRecCad" widgetVar="tblRecursoCadastro"
+					value="#{recursoBean.listaRecursos}"
+					filteredValue="#{recursoBean.listaRecursosFiltrados}"
+					emptyMessage="Nenhum registro Encontrado!"
+					var="listaRecursosFiltrados" rows="5" paginator="true"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks}
+						{NextPageLink} {LastPageLink} {Exporters}"
+					style="max-width: 1050px; min-width: 1050px">
+					
+				<f:facet name="{Exporters}">
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="pdf.png" width="24" title="Emitir Relatórios em PDF"/>
+						<p:dataExporter preProcessor="true" type="pdf" target="tblRecCad"
+							fileName="RelatórioDeRecursos" encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="excel.png" width="24" title="Emitir Relatórios em EXCEL"/>
+						<p:dataExporter preProcessor="true" type="xls" target="tblRecCad"
+							fileName="RelatórioDeRecursos" encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="xml.png" width="24" title="Emitir Relatórios em XLM"/>
+						<p:dataExporter preProcessor="true" type="xml" target="tblRecCad"
+							fileName="RelatórioDeRecursos" encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="csv.png" width="24" title="Emitir Relatórios em CSV"/>
+						<p:dataExporter preProcessor="true" type="csv" target="tblRecCad"
+							fileName="RelatórioDeRecursos" encoding="ISO-8859-1"/>
+					</h:commandLink>
+				</f:facet>	
+					
+					<p:column headerText="Unidade" width="45%"
+						filterBy="#{listaRecursosFiltrados.unidade.razaoSocialUnidade}"
+						sortBy="#{listaRecursosFiltrados.unidade.razaoSocialUnidade}"
+						rendered="#{usuarioBean.unidadeGestora != null}">
+						<h:outputText value="#{listaRecursosFiltrados.unidade.razaoSocialUnidade}" />
+					</p:column>
+
+					<p:column headerText="Patrimônio" width="15%"
+						filterBy="#{listaRecursosFiltrados.patrimonioRecurso}"
+						sortBy="#{listaRecursosFiltrados.patrimonioRecurso}">
+						<h:outputText value="#{listaRecursosFiltrados.patrimonioRecurso}" />
+					</p:column>
+
+					<p:column headerText="Nome Recurso" width="25%"
+						filterBy="#{listaRecursosFiltrados.identificacaoRecurso}"
+						sortBy="#{listaRecursosFiltrados.identificacaoRecurso}">
+						<h:outputText
+							value="#{listaRecursosFiltrados.identificacaoRecurso}" />
+					</p:column>
+
+					<p:column headerText="Modelo" width="17%"
+						filterBy="#{listaRecursosFiltrados.modeloRecurso}"
+						sortBy="#{listaRecursosFiltrados.modeloRecurso}">
+						<h:outputText value="#{listaRecursosFiltrados.modeloRecurso}" />
+					</p:column>
+
+					<p:column headerText="Subcategoria" width="18%"
+						filterBy="#{listaRecursosFiltrados.subCategoria.nomeSubCategoria}"
+						sortBy="#{listaRecursosFiltrados.subCategoria.nomeSubCategoria}">
+						<h:outputText value="#{listaRecursosFiltrados.subCategoria.nomeSubCategoria}" />
+					</p:column>
+
+					<p:column headerText="Status" width="18%"
+						filterBy="#{listaRecursosFiltrados.status.nomeStatus}"
+						sortBy="#{listaRecursosFiltrados.status.nomeStatus}">
+						<h:outputText value="#{listaRecursosFiltrados.status.nomeStatus}" />
+					</p:column>
+
+					<p:column headerText="Opções" width="11%" exportable="false"
+						rendered="#{usuarioBean.unidadeGestora == null}">
+						
+						<p:commandButton icon="ui-icon-pencil" title="Editar Recurso"
+							oncomplete="PF('dlgRecEditar').show();"
+							actionListener="#{recursoBean.carregarCadastro}"
+							update=":frmDlgRecEdi:pnlRecurso ">
+							<f:param name="codRecurso"	value="#{listaRecursosFiltrados.numSerieRecurso}" />
+							<f:setPropertyActionListener target="#{recursoBean.recursoCadastro}"
+								value="#{listaRecursosFiltrados}" />
+						</p:commandButton>
+
+						<p:commandButton icon="ui-icon-trash" title="Excluir Recurso"
+							oncomplete="PF('dlgRecExcluir').show();"
+							actionListener="#{recursoBean.carregarCadastro}"
+							update=":frmDlgRecExc:pnlRecursoExc">
+							<f:param name="codRecurso"
+								value="#{listaRecursosFiltrados.numSerieRecurso}" />
+							<f:setPropertyActionListener
+								target="#{recursoBean.recursoCadastro}"
+								value="#{listaRecursosFiltrados}" />
+						</p:commandButton>
+					</p:column>
+
+				</p:dataTable>
+
+			</h:form>
+		</p:dialog>
+
+		<p:dialog id="dlgRecuEditar" header="Editar Recurso:"
+			widgetVar="dlgRecEditar" resizable="false" modal="true"
+			appendTo="@(body)" showEffect="fade" hideEffect="fade"
+			closable="false">
+			
+			<h:panelGrid id="pngRecEdi">
+						<h:outputText value="Unidade: #{autenticacaoBean.usuarioAutenticado.unidade.razaoSocialUnidade}" />
+			</h:panelGrid>
+
+			<p:separator />
+			
+			<h:form id="frmDlgRecEdi">
+				<h:panelGrid id="pnlRecurso" columns="4">
+					<p:outputLabel for="txtnumSerieRecurso" value="Nº. Série:" />
+					<h:outputLabel id="txtnumSerieRecurso" size="20"
+						value="#{recursoBean.recursoCadastro.numSerieRecurso}">
+					</h:outputLabel>
+
+					<p:outputLabel for="txtPatrimonioRecurso" value="Patrimônio:" />
+					<p:inputText id="txtPatrimonioRecurso" size="20"
+						value="#{recursoBean.recursoCadastro.patrimonioRecurso}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:outputLabel for="txtIndentificacaoRecurso" value="Recurso:" />
+					<p:inputText id="txtIndentificacaoRecurso" size="25"
+						title="Nome do Recurso(Computador Lenovo, Televisor SONY EX, Microfone sem Fio)"
+						value="#{recursoBean.recursoCadastro.identificacaoRecurso}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:outputLabel for="txtModeloRecurso" value="Modelo:" />
+					<p:inputText id="txtModeloRecurso" size="25"
+						value="#{recursoBean.recursoCadastro.modeloRecurso}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:outputLabel value="Subcategoria:" title="subcategoria (Computador, Televisor, Notebook)" />
+					<p:selectOneMenu id="slcRecSubCad"
+						value="#{recursoBean.recursoCadastro.subCategoria}"
+						converter="subCategoriaConverter" filter="true">
+						<f:selectItem itemValue="" itemLabel="Selecione:"/>
+						<f:selectItems value="#{recursoBean.listaSubCategorias}"
+							var="listaSubCategorias" itemValue="#{listaSubCategorias}"
+							itemLabel="#{listaSubCategorias.nomeSubCategoria}" />
+						<f:validateBean />
+					</p:selectOneMenu>
+
+					<p:outputLabel value="Status:" />
+					<p:selectOneMenu id="slcRecStaCad"
+						value="#{recursoBean.recursoCadastro.status}"
+						converter="statusConverter" filter="true">
+						<f:selectItem itemValue="" itemLabel="Selecione:" />
+						<f:selectItems value="#{recursoBean.listaStatus}"
+							var="listaStatus" itemValue="#{listaStatus}"
+							itemLabel="#{listaStatus.nomeStatus}" />
+						<f:validateBean />
+					</p:selectOneMenu>
+				</h:panelGrid>
+	
+				<p:separator />
+			
+				<h:panelGrid columns="2">
+				<p:commandButton value="Editar"
+					actionListener="#{recursoBean.Editar}"
+					update=":msgAviso :frmDlgRecEdi:pnlRecurso :frmDlgRecCad:tblRecCad"
+					oncomplete="PF('dlgRecEditar').hide();" />
+
+				<p:commandButton value="Sair"
+					oncomplete="PF('dlgRecEditar').hide(); PF('dlgRecMostrar').show();">
+					<p:resetInput target="pnlRecurso" />
+				</p:commandButton>
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog id="dlgRecuExcluir" header="Excluir Recurso:"
+			widgetVar="dlgRecExcluir" resizable="false" modal="true"
+			appendTo="@(body)" showEffect="fade" hideEffect="fade"
+			closable="false">
+
+			<h:panelGrid id="pngRecExc">
+					<h:outputText value="Unidade: #{autenticacaoBean.usuarioAutenticado.unidade.razaoSocialUnidade}" />
+			</h:panelGrid>
+
+			<p:separator />
+
+			<h:form id="frmDlgRecExc">
+				<h:panelGrid id="pnlRecursoExc" columns="4">
+					<p:outputLabel for="txtnumSerieRecursoExc" value="Nº. Série:" />
+					<h:outputLabel id="txtnumSerieRecursoExc" size="20"
+						value="#{recursoBean.recursoCadastro.numSerieRecurso}">
+					</h:outputLabel>
+
+					<p:outputLabel for="txtPatrimonioRecursoExc" value="Patrimônio:" />
+					<p:inputText id="txtPatrimonioRecursoExc" size="20"
+						value="#{recursoBean.recursoCadastro.patrimonioRecurso}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:outputLabel for="txtIndentificacaoRecursoExc" value="Recurso:" />
+					<p:inputText id="txtIndentificacaoRecursoExc" size="25"
+						title="Nome do Recurso(Computador Lenovo, Televisor SONY EX, Microfone sem Fio)"
+						value="#{recursoBean.recursoCadastro.identificacaoRecurso}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:outputLabel for="txtModeloRecursoExc" value="Modelo:" />
+					<p:inputText id="txtModeloRecursoExc" size="25"
+						value="#{recursoBean.recursoCadastro.modeloRecurso}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:outputLabel value="Subcategoria:" title="Subcategoria" />
+					<p:selectOneMenu id="slcRecSubCadExc"
+						value="#{recursoBean.recursoCadastro.subCategoria}"
+						converter="subCategoriaConverter" filter="true">
+						<f:selectItem itemValue="" itemLabel="Selecione:" />
+						<f:selectItems value="#{recursoBean.listaSubCategorias}"
+							var="listaSubCategorias" itemValue="#{listaSubCategorias}"
+							itemLabel="#{listaSubCategorias.nomeSubCategoria}" />
+						<f:validateBean />
+					</p:selectOneMenu>
+
+					<p:outputLabel value="Status:" />
+					<p:selectOneMenu id="slcRecStaCadExc"
+						value="#{recursoBean.recursoCadastro.status}"
+						converter="statusConverter" filter="true">
+						<f:selectItem itemValue="" itemLabel="Selecione:" />
+						<f:selectItems value="#{recursoBean.listaStatus}"
+							var="listaStatus" itemValue="#{listaStatus}"
+							itemLabel="#{listaStatus.nomeStatus}" />
+						<f:validateBean />
+					</p:selectOneMenu>
+				</h:panelGrid>
+	
+				<p:separator />
+				
+				<h:panelGrid columns="2">
+					<p:commandButton value="Excluir"
+						actionListener="#{recursoBean.Excluir}"
+						update=":msgAviso :frmDlgRecCad:tblRecCad"
+						oncomplete="PF('dlgRecExcluir').hide();" />
+					<p:commandButton value="Sair"
+						oncomplete="PF('dlgRecExcluir').hide(); PF('dlgRecMostrar').show();">
+						<p:resetInput target="pnlRecurso" />
+					</p:commandButton>
+			 	</h:panelGrid>	
+			</h:form>
+		</p:dialog>
+	</ui:define>
+</ui:composition>
+</html>

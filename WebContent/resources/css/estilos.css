@@ -1,0 +1,9 @@
+/* Informado a Linguagem a ser usada */
+@CHARSET "UTF-8";
+
+/* informando que os Objetos e os SubObjetos serão afetados */
+.ui-widget, .ui-widget .ui-widget{
+	/* Informando tamanho da fonte a ser usada */
+	font-size: 95%
+	
+}

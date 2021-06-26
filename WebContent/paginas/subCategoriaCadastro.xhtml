@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition template="/templates/layoutGeral.xhtml">
+
+	<ui:define name="metadata">
+		<f:metadata>
+			<f:event listener="#{subCategoriaBean.carregarPesquisa}" type="preRenderView" />
+			<f:event listener="#{subCategoriaBean.carregarCadastro}" type="preRenderView" />
+			<f:event listener="#{usuarioBean.verificaFuncaoUsuario}" type="preRenderView" />
+
+			<f:viewParam name="subcod" value="#{subCategoriaBean.codigo}" />
+			<f:viewParam name="subCcao" value="#{subCategoriaBean.acao}" />
+			<f:viewParam name="catcod" value="#{categoriaBean.codigo}" />
+			<f:viewParam name="catacao" value="#{categoriaBBean.acao}" />
+		</f:metadata>
+	</ui:define>
+
+	<ui:define name="conteudo">
+
+		<p:dialog id="dlgSubCMostrar" header="Cadastrar SubCategorias:"
+			widgetVar="dlgCidMostrar" resizable="false" modal="true"
+			appendTo="@(body)" showEffect="fade" hideEffect="fade" visible="true"
+			draggable="false" closable="false">
+
+			<p:separator />
+
+			<h:form id="frmDlgCidCad">
+				<h:panelGrid id="pnlSubCategoria1" columns="4">
+					<p:outputLabel for="txtNomeSubCategoria" value="SubCategoria:" />
+					<p:inputText id="txtNomeSubCategoria" size="30" title="subcategoria (Computador, Televisor, Notebook)"
+						value="#{subCategoriaBean.subCategoriaCadastro.nomeSubCategoria}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:outputLabel value="Categoria:" />
+					<p:selectOneMenu id="slcCidEstCad" required="true"
+						requiredMessage="A Seleção de uma Categoria é Obrigatória!"
+						value="#{subCategoriaBean.subCategoriaCadastro.categoria}"
+						converter="categoriaConverter" filter="true">
+						<f:selectItem itemValue="" itemLabel="Selecione:" />
+						<f:selectItems value="#{subCategoriaBean.listaCategorias}"
+							var="listaCategorias" itemValue="#{listaCategorias}"
+							itemLabel="#{listaCategorias.nomeCategoria}" />
+						<f:validateBean />
+					</p:selectOneMenu>
+
+					<p:commandButton id="btnSalvar" value="Salvar"
+						widgetVar="botaoSalvar" actionListener="#{subCategoriaBean.salvar}"
+						update=":msgAviso :frmDlgCidCad:txtNomeSubCategoria  :frmDlgCidCad:slcCidEstCad :frmDlgCidCad:tblCidCad" />
+
+					<p:button value="Sair" onclick="PF('dlgCidMostrar').hide();"
+						outcome="/paginas/homerPrincipal.xhtml"/>
+				</h:panelGrid>
+
+
+				<p:separator />
+
+				<p:dataTable id="tblCidCad" widgetVar="tblSubCategoriaCadastro"
+					value="#{subCategoriaBean.listaSubCategorias}"
+					filteredValue="#{subCategoriaBean.listaSubCategoriasFiltradas}"
+					emptyMessage="Nenhum registro Encontrado!"
+					var="listaSubCategoriasFiltradas" rows="6" paginator="true"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks}
+						{NextPageLink} {LastPageLink} {Exporters}"
+					style="max-width: 630px; min-width: 630px">
+					
+				<f:facet name="{Exporters}">
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="pdf.png" width="24" title="Emitir Relatórios em PDF"/>
+						<p:dataExporter preProcessor="true" type="pdf" target="tblCidCad"
+							fileName="RelatórioDeSubCategorias" encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="excel.png" width="24" title="Emitir Relatórios em EXCEL"/>
+						<p:dataExporter preProcessor="true" type="xls" target="tblCidCad"
+							fileName="RelatórioDeSubCategorias" encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="xml.png" width="24" title="Emitir Relatórios em XLM"/>
+						<p:dataExporter preProcessor="true" type="xml" target="tblCidCad"
+							fileName="RelatórioDeSubCategorias" encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="csv.png" width="24" title="Emitir Relatórios em CSV"/>
+						<p:dataExporter preProcessor="true" type="csv" target="tblCidCad"
+							fileName="RelatórioDeSubCategorias" encoding="ISO-8859-1"/>
+					</h:commandLink>
+				</f:facet>	
+
+					<p:column headerText="Código" width="13%"
+						filterBy="#{listaSubCategoriasFiltradas.codSubCategoria}"
+						sortBy="#{listaSubCategoriasFiltradas.codSubCategoria}">
+						<h:outputText value="#{listaSubCategoriasFiltradas.codSubCategoria}" />
+					</p:column>
+
+					<p:column headerText="Nome SubCategoria" width="20%"
+						filterBy="#{listaSubCategoriasFiltradas.nomeSubCategoria}"
+						sortBy="#{listaSubCategoriasFiltradas.nomeSubCategoria}">
+						<h:outputText value="#{listaSubCategoriasFiltradas.nomeSubCategoria}" />
+					</p:column>
+
+					<p:column headerText="Categoria" width="15%"
+						filterBy="#{listaSubCategoriasFiltradas.categoria.nomeCategoria}"
+						sortBy="#{listaSubCategoriasFiltradas.categoria.nomeCategoria}">
+						<h:outputText value="#{listaSubCategoriasFiltradas.categoria.nomeCategoria}" />
+					</p:column>
+
+					<p:column headerText="Opções" width="8%" exportable="false">
+
+						<p:commandButton icon="ui-icon-pencil" title="Editar SubCategoria"
+							oncomplete="PF('dlgCidEditar').show();"
+							actionListener="#{subCategoriaBean.carregarCadastro}"
+							update=":frmDlgCidEdi:pnlSubCategoria :frmDlgCidEdi:pnlSubCategoriaEdi1">
+							<f:param name="codSubCategoria" value="#{listaSubCategoriasFiltradas.codSubCategoria}" />
+							<f:setPropertyActionListener target="#{subCategoriaBean.subCategoriaCadastro}"
+								value="#{listaSubCategoriasFiltradas}" />
+						</p:commandButton>
+
+						<p:commandButton icon="ui-icon-trash" title="Excluir SubCategoria"
+							oncomplete="PF('dlgCidExcluir').show();"
+							actionListener="#{subCategoriaBean.carregarCadastro}"
+							update=":frmDlgCidExc:pnlSubCategoriaExc :frmDlgCidExc:pnlSubCategoriaExc1"
+							rendered="#{autenticacaoBean.usuarioAutenticado.unidade.unidade == null}">
+							<f:param name="codSubCategoria"
+								value="#{listaSubCategoriasFiltradas.codSubCategoria}" />
+							<f:setPropertyActionListener
+								target="#{subCategoriaBean.subCategoriaCadastro}"
+								value="#{listaSubCategoriasFiltradas}" />
+						</p:commandButton>
+					</p:column>
+
+				</p:dataTable>
+
+			</h:form>
+		</p:dialog>
+
+		<p:dialog id="dlgCidaEditar" header="Editar SubCategoria:"
+			widgetVar="dlgCidEditar" resizable="false" modal="true"
+			appendTo="@(body)" showEffect="fade" hideEffect="fade"
+			closable="false">
+
+			<p:separator />
+
+			<h:form id="frmDlgCidEdi">
+				<h:panelGrid id="pnlSubCategoria" columns="2">
+					<p:outputLabel for="txtCodSubCategoria" value="Código:" />
+					<p:inputText id="txtCodSubCategoria" size="10"
+						value="#{subCategoriaBean.subCategoriaCadastro.codSubCategoria}" readonly="true" />
+				</h:panelGrid>
+
+				<h:panelGrid id="pnlSubCategoriaEdi1" columns="4">
+					<p:outputLabel for="txtNomeSubCategoria" value="SubCategoria:" />
+					<p:inputText id="txtNomeSubCategoria" size="35" title="subcategoria (Computador, Televisor, Notebook)"
+						value="#{subCategoriaBean.subCategoriaCadastro.nomeSubCategoria}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:outputLabel value="Categoria:" />
+					<p:selectOneMenu id="slcCidEstCad" value="#{subCategoriaBean.subCategoriaCadastro.categoria}"
+						converter="categoriaConverter" filter="true">
+						<f:selectItem itemValue="" itemLabel="Categoria:" />
+						<f:selectItems value="#{subCategoriaBean.listaCategorias}"
+							var="listaCategorias" itemValue="#{listaCategorias}"
+							itemLabel="#{listaCategorias.nomeCategoria}" />
+						<f:validateBean />
+					</p:selectOneMenu>
+
+					<p:commandButton value="Editar"
+						actionListener="#{subCategoriaBean.editar}"
+						update=":msgAviso :frmDlgCidEdi:pnlSubCategoria :frmDlgCidEdi:pnlSubCategoriaEdi1 :frmDlgCidCad:tblCidCad"
+						oncomplete="PF('dlgCidEditar').hide();" />
+					<p:commandButton value="Sair"
+						oncomplete="PF('dlgCidEditar').hide(); PF('dlgCidMostrar').show();">
+						<p:resetInput target="pnlSubCategoria" />
+					</p:commandButton>
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog id="dlgSubCExcluir" header="Excluir SubCategoria:"
+			widgetVar="dlgCidExcluir" resizable="false" modal="true"
+			appendTo="@(body)" showEffect="fade" hideEffect="fade"
+			closable="false">
+
+			<p:separator />
+
+			<h:form id="frmDlgCidExc">
+				<h:panelGrid id="pnlSubCategoriaExc" columns="2">
+					<p:outputLabel for="txtCodSubCategoriaExc" value="Código:" />
+					<p:inputText id="txtCodSubCategoriaExc" size="10"
+						value="#{subCategoriaBean.subCategoriaCadastro.codSubCategoria}" readonly="true" />
+				</h:panelGrid>
+
+				<h:panelGrid id="pnlSubCategoriaExc1" columns="4">
+					<p:outputLabel for="txtNomeSubCategoriaExc" value="SubCategoria:" />
+					<p:inputText id="txtNomeSubCategoriaExc" size="35" title="subcategoria (Computador, Televisor, Notebook)"
+						value="#{subCategoriaBean.subCategoriaCadastro.nomeSubCategoria}" >
+						<f:validateBean />
+					</p:inputText>
+
+					<p:outputLabel value="Categoria:" />
+					<p:selectOneMenu id="slcCidEstCad"
+						value="#{subCategoriaBean.subCategoriaCadastro.categoria}"
+						converter="categoriaConverter" filter="true">
+						<f:selectItem itemValue="" itemLabel="Categoria:" />
+						<f:selectItems value="#{subCategoriaBean.listaCategorias}"
+							var="listaCategorias" itemValue="#{listaCategorias}"
+							itemLabel="#{listaCategorias.nomeCategoria}" itemDisabled="true" />
+						<f:validateBean />
+					</p:selectOneMenu>
+
+					<p:commandButton value="Excluir"
+						actionListener="#{subCategoriaBean.excluir}"
+						update=":msgAviso :frmDlgCidExc:pnlSubCategoriaExc :frmDlgCidExc:pnlSubCategoriaExc1 :frmDlgCidCad:tblCidCad"
+						oncomplete="PF('dlgCidExcluir').hide();" />
+					<p:commandButton value="Sair"
+						oncomplete="PF('dlgCidExcluir').hide(); PF('dlgCidMostrar').show();">
+						<p:resetInput target="pnlSubCategoria" />
+					</p:commandButton>
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+	</ui:define>
+</ui:composition>
+</html>

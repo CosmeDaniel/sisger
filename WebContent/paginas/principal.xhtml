@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition template="/templates/layoutGeral.xhtml">
+
+	<ui:define name="metadata">
+		<f:metadata>
+			<f:viewParam name="emailDigitado" value="#{autenticacaoBean.emailUsuario}" />
+		</f:metadata>
+	</ui:define>
+
+	<ui:define name="conteudo">
+		<p:dialog id="dlgPrincipalMostrar" header="SisGeR - Sistema de Gestão de Recursos-OnLine:"
+			widgetVar="dlgPrincipal" resizable="false" modal="true" closable="false"
+			appendTo="@(body)" showEffect="explode" hideEffect="explode" visible="true"
+			draggable="false">
+			<h:form id="frmLogarSistema">
+				<p:panel header="Logar" >
+					<h:panelGrid columns="4" cellpadding="5">
+						<h:outputLabel for="txtLogin" value="Login:" />
+						<p:inputText id="txtLogin"
+							value="#{autenticacaoBean.usuarioAutenticado.loginUsuario}">						
+							<f:validateBean/>
+						</p:inputText>
+
+						<h:outputLabel for="txtSenha" value="Senha:"/>
+						<p:password id="txtSenha" maxlength="8"
+							value="#{autenticacaoBean.usuarioAutenticado.senhaUsuario}" >					
+							<f:validateBean/>
+						</p:password>
+					</h:panelGrid>
+					
+					<h:panelGrid columns="2"  width="100%" style="text-align:center">
+						<p:commandButton value="Acesso ao Sistema" icon="ui-icon-check"
+							action="#{autenticacaoBean.autenticarSistema}"
+							oncomplete="if(args.logado == true) {PF('dlgPrincipal').hide();}"
+							update=":msgAviso"/>
+															
+						<p:commandButton value="Esqueci Senha" icon="ui-icon-help"
+							oncomplete="PF('dlgEsqSenha').show();"/>
+					</h:panelGrid>	
+				</p:panel>
+			</h:form>
+		</p:dialog>
+		
+		<p:graphicImage library="images" name="sisger.png" width="100%" height="430px" /> 		
+		
+		<p:dialog id="dlgEsqueciSenha" header="SisGeR - Sistema de Gestão de Recursos-OnLine:"
+			widgetVar="dlgEsqSenha" resizable="false" modal="true" closable="true"
+			appendTo="@(body)" showEffect="explode" hideEffect="explode" visible="false"
+			draggable="false">
+			<h:form id="frmRecuperarEmail">
+				<p:panel id="pnlEsqueciSenha" header="Recuperar Senha" >
+				
+					<h:panelGrid id="pngEsqueciSenha" cellpadding="1">
+						<h:outputLabel for="txtEsqueciSenha" value="Informe seu E-mail:" />
+						<p:inputText size="55" id="txtEsqueciSenha" required="true"
+							requiredMessage="E-mail é Obrigatório!"
+							value="#{autenticacaoBean.emailUsuario}"
+							title="Informe o E-mail Cadastrado no SisGeR!">						
+						</p:inputText>
+					</h:panelGrid>
+
+					
+					<h:panelGrid id="btnsEsqueciSenha" columns="2">
+						<p:commandButton value="Recuperar" icon="ui-icon-check"
+							update=":msgAviso" action="#{autenticacaoBean.recuperarEmailUsuario}"
+							oncomplete="if(args.fecharTelaRecuperaEmail == true){PF('dlgEsqSenha').hide();}; PF('dlgEsqSenha').show();">	
+							<f:param name="emailDigitado" value="#{autenticacaoBean.emailUsuario}"/>
+						</p:commandButton>
+
+						<p:ajaxStatus style="display:block;margin-bottom:1;height:24px;">				 
+						    <f:facet name="start">
+						        <p:graphicImage name="/images/ajaxloadingbar.gif" />
+						    </f:facet>
+						</p:ajaxStatus>
+					</h:panelGrid>
+															
+				</p:panel>
+			</h:form>
+		</p:dialog>
+		
+	</ui:define>
+</ui:composition>
+
+</html>

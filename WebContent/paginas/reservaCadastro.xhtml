@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition template="/templates/layoutGeral.xhtml">
+	<ui:define name="metadata">
+		<f:metadata>
+			<f:event listener="#{recursoBean.carregarPesquisa}"	type="preRenderView" />
+			<f:event listener="#{recursoBean.carregarCadastro}"	type="preRenderView" />
+			<f:event listener="#{reservaBean.carregarPesquisa}"	type="preRenderView" />
+			<f:event listener="#{reservaBean.carregarCadastro}"	type="preRenderView" />
+			<f:event listener="#{usuarioBean.carregarPesquisa}"	type="preRenderView" />
+			<f:event listener="#{usuarioBean.verificaFuncaoUsuario}" type="preRenderView" />
+
+			<f:viewParam name="rescod" value="#{reservaBean.codigo}" />
+			<f:viewParam name="rescao" value="#{reservaBean.acao}" />
+			<f:viewParam name="reccod" value="#{recursoBean.codigo}" />
+			<f:viewParam name="recacao" value="#{recursoBean.acao}" />
+		</f:metadata>
+
+	</ui:define>
+
+	<ui:define name="conteudo">
+		<p:panel header="Cadastrar Reserva de recurso: #{autenticacaoBean.usuarioAutenticado.unidade.razaoSocialUnidade}">
+			
+			<h:form id="frmReservaCadastro">
+				<h:panelGrid id="pngDatSoli" columns="4">
+					<h:outputLabel value="Dt. Reser.: " id="otlDtResCad" for="txtDatResCad" />
+					<p:inputText value="#{reservaBean.reservaCadastro.dataReserva}"
+						id="txtDatResCad" readonly="true" title="Data da Solicitação da Reserva">
+						<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss"
+							timeZone="America/Sao_Paulo" locale="pt_BR" />
+					</p:inputText>
+
+					<h:outputLabel value="Solicitante: " id="otlResCad"	for="txtUsiResCad" />
+					<p:inputText value="#{autenticacaoBean.usuarioAutenticado.nomeUsuario}"
+						id="txtUsiResCad" readonly="true" size="50"
+						rendered="#{reservaBean.funcaoUsuario == null}"
+						title="Usuário solicitante da Reserva">
+						</p:inputText>	
+						
+					<p:selectOneMenu id="slcUsuRecResCad" required="true" value="#{reservaBean.reservaCadastro.usuario}"
+						converter="usuarioConverter" filter="true" rendered="#{reservaBean.funcaoUsuario != null}"
+						requiredMessage="O campo Solicitante é Obrigatório">
+						<f:selectItem itemValue="" itemLabel="Selecione:" />
+						<f:selectItems value="#{usuarioBean.listaUsuarios}"
+							var="listaUsuarios" itemValue="#{listaUsuarios}"
+							itemLabel="#{listaUsuarios.nomeUsuario}" />
+						<f:validateBean />
+					</p:selectOneMenu>	
+				</h:panelGrid>
+
+				<p:separator />
+
+				<h:panelGrid id="pngDatInDatFim" columns="7">
+				
+					<h:outputLabel value="Dat. Inicial: " id="otlDtIniResCad" for="cldDataIni" />
+					<p:calendar id="cldDataIni"	value="#{reservaBean.reservaCadastro.dataInicialReserva}"
+						title="Data Inicial da Reserva do recurso" mindate="#{reservaBean.reservaCadastro.dataReserva}"
+						pattern="dd/MM/yyyy HH:mm" timeZone="America/Sao_Paulo" locale="pt_BR">
+						<p:ajax event="dateSelect" update=":msgAviso :frmReservaCadastro:cldDataFim "
+							listener="#{reservaBean.pegarDataInicial}"/>
+						<f:param name="Ativar" value="Ativar"/>	
+					</p:calendar>
+
+					<h:outputLabel value="Dat. Final: " id="otlDtFinResCad"	for="cldDataFim" />
+					<p:calendar id="cldDataFim" value="#{reservaBean.reservaCadastro.dataFinalReserva}"
+						title="Data Final da Reserva do recurso" 
+						pattern="dd/MM/yyyy HH:mm" timeZone="America/Sao_Paulo" locale="pt_BR"
+						disabled="#{reservaBean.bloqueaCalendario == NULL}">
+						<p:ajax event="dateSelect" update=":msgAviso :frmReservaCadastro:btnAdiRecurso"
+							listener="#{reservaBean.pegarDataFinal}"/>
+						<f:param name="Ativar" value="Ativar"/>		
+					</p:calendar>
+
+					<p:outputLabel value="Status:" />
+					<p:selectOneMenu id="slcRecStaCad" required="true" value="#{reservaBean.reservaCadastro.status}"
+						converter="statusConverter" filter="true" requiredMessage="O campo Status é Obrigatório">
+						<f:selectItems value="#{reservaBean.listaStatus}" var="listaStatus" itemValue="#{listaStatus}"
+							itemLabel="#{listaStatus.nomeStatus}" />
+						<f:validateBean />
+					</p:selectOneMenu>
+
+					<p:commandButton id="btnAdiRecurso" icon="ui-icon-cart" value="Selecionar Recurso" 
+						actionListener="#{reservaBean.pegarDataInicial}" action="reservaBean.pegarDataFinal"
+						type="submit" immediate="true" title="Preencha os campos Data Inicial e Final."
+						oncomplete="PF('dlgRecReserCadastrar').show();"
+						disabled="#{reservaBean.bloqueaSelecionarRec == NULL}">
+					</p:commandButton>					
+				</h:panelGrid>
+
+				<h:panelGrid columns="2">
+					<p:commandButton id="btnSalvar" value="Salvar"
+						widgetVar="botaoSalvar" actionListener="#{reservaBean.salvar}"
+						update=":msgAviso :frmReservaCadastro">					
+					</p:commandButton>	
+
+					<p:button value="Sair" outcome="/paginas/homerPrincipal.xhtml" />
+				</h:panelGrid>
+
+				<p:dataTable id="tblReserCad" widgetVar="tblReservaCadastro"
+					value="#{reservaBean.listaReserva}"
+					filteredValue="#{reservaBean.listaReservaFiltradas}"
+					emptyMessage="Nenhum registro Encontrado!"
+					var="listaReservaFiltradas" rows="4" paginator="true"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks}
+						{NextPageLink} {LastPageLink} {Exporters}">
+						
+				<f:facet name="{Exporters}">
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="pdf.png" width="24" title="Emitir Relatórios em PDF"/>
+						<p:dataExporter preProcessor="true" type="pdf" target="tblReserCad"
+							fileName="RelatórioDeReservas" encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="excel.png" width="24" title="Emitir Relatórios em EXCEL"/>
+						<p:dataExporter preProcessor="true" type="xls" target="tblReserCad"
+							fileName="RelatórioDeReservas" encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="xml.png" width="24" title="Emitir Relatórios em XLM"/>
+						<p:dataExporter preProcessor="true" type="xml" target="tblReserCad"
+							fileName="RelatórioDeReservas" encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="csv.png" width="24" title="Emitir Relatórios em CSV"/>
+						<p:dataExporter preProcessor="true" type="csv" target="tblReserCad"
+							fileName="RelatórioDeReservas" encoding="ISO-8859-1"/>
+					</h:commandLink>
+				</f:facet>		
+
+					<p:column headerText="Cód." width="1%">
+						<h:outputText value="#{listaReservaFiltradas.codReserva}" />
+					</p:column>
+
+					<p:column headerText="Data Reserva" width="5.5%" filterMatchMode="contains"
+						filterBy="#{listaReservaFiltradas.dataReserva}"
+						sortBy="#{listaReservaFiltradas.dataReserva}" >
+						<h:outputText value="#{listaReservaFiltradas.dataReserva}"
+							title="Para Filtrar por data Insira data (AAAA-MM-DD).">
+							<f:convertDateTime pattern="dd/MM/yyyy" timeZone="America/Sao_Paulo"
+								locale="pt_BR"/>
+						</h:outputText>	
+					</p:column>
+
+					<p:column headerText="Data Inicial" width="5.5%" filterMatchMode="contains"
+						filterBy="#{listaReservaFiltradas.dataInicialReserva}"
+						sortBy="#{listaReservaFiltradas.dataInicialReserva}">
+						<h:outputText value="#{listaReservaFiltradas.dataInicialReserva}"
+							title="Para Filtrar por data Insira data (AAAA-MM-DD).">
+							<f:convertDateTime pattern="dd/MM/yyyy HH:mm" timeZone="America/Sao_Paulo"
+								locale="pt_BR"/>
+						</h:outputText>
+					</p:column>
+
+					<p:column headerText="Data Final" width="5.5%" filterMatchMode="contains"
+						filterBy="#{listaReservaFiltradas.dataFinalReserva}"
+						sortBy="#{listaReservaFiltradas.dataFinalReserva}">
+						<h:outputText value="#{listaReservaFiltradas.dataFinalReserva}"
+							title="Para Filtrar por data Insira data (AAAA-MM-DD).">
+							<f:convertDateTime pattern="dd/MM/yyyy HH:mm" timeZone="America/Sao_Paulo"
+								locale="pt_BR"/>
+						</h:outputText>
+					</p:column>
+
+					<p:column headerText="Solicitante" width="5%"
+						filterBy="#{listaReservaFiltradas.usuario.nomeUsuario}"
+						sortBy="#{listaReservaFiltradas.usuario.nomeUsuario}">
+						<h:outputText value="#{listaReservaFiltradas.usuario.nomeUsuario}" />
+					</p:column>
+
+					<p:column headerText="Recurso" width="5%"
+						filterBy="#{listaReservaFiltradas.recurso.subCategoria.nomeSubCategoria}"
+						sortBy="#{listaReservaFiltradas.recurso.subCategoria.nomeSubCategoria}">
+						<h:outputText value="#{listaReservaFiltradas.recurso.subCategoria.nomeSubCategoria}" />
+					</p:column>
+					
+					<p:column headerText="Status" width="5%"
+						filterBy="#{listaReservaFiltradas.status.nomeStatus}"
+						sortBy="#{listaReservaFiltradas.status.nomeStatus}">
+						<h:outputText value="#{listaReservaFiltradas.status.nomeStatus}" />
+					</p:column>					
+					
+					<p:column width="1.2%" exportable="false">
+						<p:commandButton icon="ui-icon-pencil" title="Editar Reserva"
+							oncomplete="PF('dlgRecReserEditar').show();"
+							action="#{reservaBean.carregarCadastro}"
+							update=":frmDlgRecReserCad:tblRecReserCad :frmReservaEditar">
+							<f:param name="codReserva" value="#{listaReservaFiltradas.codReserva}"/>	
+						</p:commandButton>				
+					</p:column>					
+				</p:dataTable>
+			</h:form>
+		</p:panel>
+
+		<p:dialog id="dlgRecReser" widgetVar="dlgRecReserCadastrar"
+			header="Seleção de recurso:" resizable="false" appendTo="@(body)"
+			showEffect="fade" hideEffect="fade" draggable="false" closable="true" modal="true">
+
+			<h:form id="frmDlgRecReserCad">
+				<p:dataTable id="tblRecReserCad" widgetVar="tblRecursoCadastro"
+					value="#{recursoBean.listaRecursosLiberados}"
+					filteredValue="#{recursoBean.listaRecursosFiltrados}"
+					emptyMessage="Nenhum registro Encontrado!"
+					var="listaRecursosFiltrados" rows="7" paginator="true"
+					style="max-width: 945px; min-width: 945px">
+
+					<p:column headerText="Nome Recurso" width="25%"
+						filterBy="#{listaRecursosFiltrados.identificacaoRecurso}"
+						sortBy="#{listaRecursosFiltrados.identificacaoRecurso}">
+						<h:outputText value="#{listaRecursosFiltrados.identificacaoRecurso}" />
+					</p:column>
+
+					<p:column headerText="Modelo" width="9%"
+						filterBy="#{listaRecursosFiltrados.modeloRecurso}"
+						sortBy="#{listaRecursosFiltrados.modeloRecurso}">
+						<h:outputText value="#{listaRecursosFiltrados.modeloRecurso}" />
+					</p:column>
+
+					<p:column headerText="Recurso" width="9%"
+						filterBy="#{listaRecursosFiltrados.subCategoria.nomeSubCategoria}"
+						sortBy="#{listaRecursosFiltrados.subCategoria.nomeSubCategoria}">
+						<h:outputText value="#{listaRecursosFiltrados.subCategoria.nomeSubCategoria}" />
+					</p:column>
+
+					<p:column headerText="Status" width="9%"
+						filterBy="#{listaRecursosFiltrados.status.nomeStatus}"
+						sortBy="#{listaRecursosFiltrados.status.nomeStatus}">
+						<h:outputText value="#{listaRecursosFiltrados.status.nomeStatus}" />
+					</p:column>
+
+					<p:column headerText="Opção" width="8%">
+						<p:commandButton icon="ui-icon-cart" value="Reservar" title="Adicionar recurso a Reserva"
+							oncomplete="if(args.equipamentoLiberado == true){PF('dlgRecReserCadastrar').hide();}"
+							action="#{reservaBean.verificaConteudoDaReserva}"
+							update=":msgAviso :frmReservaCadastro:btnAdiRecurso">
+							<f:param name="Ativar" value="null"/>	
+							<f:param name="codRecurso" value="#{listaRecursosFiltrados.numSerieRecurso}" />
+							<f:param name="usuario" value="#{autenticacaoBean.usuarioAutenticado.codUsuario}" />
+							<f:param name="nomeSubCategoria" value="#{listaRecursosFiltrados.subCategoria.nomeSubCategoria}" />
+						</p:commandButton>
+					</p:column>
+				</p:dataTable>
+			</h:form>
+		</p:dialog>
+		
+		<p:dialog id="dlgEdiReser" widgetVar="dlgRecReserEditar" header="Editar Reserva:"
+			resizable="false" appendTo="@(body)" showEffect="fade" hideEffect="fade"
+			draggable="true" modal="true">
+			
+			<h:form id="frmReservaEditar">			
+				<h:panelGrid id="pngCodSoliEditi" columns="2" cellpadding="7">
+					<h:outputLabel value="Código: " id="otlCodResEdit"/>
+					<h:outputText value="#{reservaBean.reservaCadastro.codReserva}"
+						id="txtCodResEdit" readonly="true" title="Código da Reserva" size="10"/>				
+				</h:panelGrid>
+				
+				<h:panelGrid id="pngDatSoliEdit" columns="4">	
+					<h:outputLabel value="Dt. Reser.: " id="otlDtResEdit" for="txtDatResEdit" />
+					<p:inputText value="#{reservaBean.reservaCadastro.dataReserva}"
+						id="txtDatResEdit" readonly="true" title="Data da Solicitação da Reserva">
+						<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss"
+							timeZone="America/Sao_Paulo" locale="pt_BR" />
+					</p:inputText>
+
+					<h:outputLabel value="Solicitante: " id="otlResEdit"	for="txtUsiResEdit" />
+					<p:inputText value="#{autenticacaoBean.usuarioAutenticado.nomeUsuario}"
+						id="txtUsiResEdit" readonly="true" size="50" rendered="#{reservaBean.funcaoUsuario == null}"
+						title="Usuário solicitante da Reserva">
+					</p:inputText>	
+						
+					<p:selectOneMenu id="slcUsuRecResEdit" required="true" value="#{reservaBean.reservaCadastro.usuario}"
+						converter="usuarioConverter" filter="true" rendered="#{reservaBean.funcaoUsuario != null}"
+						requiredMessage="O campo Solicitante é Obrigatório">
+						<f:selectItem itemValue="" itemLabel="Selecione:" />
+						<f:selectItems value="#{usuarioBean.listaUsuarios}"	var="listaUsuarios"
+						itemValue="#{listaUsuarios}" itemLabel="#{listaUsuarios.nomeUsuario}" />
+						<f:validateBean />
+					</p:selectOneMenu>	
+				</h:panelGrid>
+
+				<p:separator />
+
+				<h:panelGrid id="pngDatInDatFimEdit" columns="7">			
+					<h:outputLabel value="Dat. Inicial: " id="otlDtIniResEdit" for="cldDataIniEdit" />
+					<p:calendar id="cldDataIniEdit"	value="#{reservaBean.reservaCadastro.dataInicialReserva}"
+						title="Data Inicial da Reserva do recurso" mindate="#{reservaBean.reservaCadastro.dataReserva}"
+						pattern="dd/MM/yyyy HH:mm" timeZone="America/Sao_Paulo" locale="pt_BR">
+						<f:param name="Ativar" value="Ativar"/>	
+					</p:calendar>
+
+					<h:outputLabel value="Dat. Final: " id="otlDtFimResEdit"	for="cldDataFimEdit" />
+					<p:calendar id="cldDataFimEdit" value="#{reservaBean.reservaCadastro.dataFinalReserva}"
+						title="Data Final da Reserva do recurso" mindate="#{reservaBean.reservaCadastro.dataReserva}"
+						pattern="dd/MM/yyyy HH:mm" timeZone="America/Sao_Paulo" locale="pt_BR">
+
+						<f:param name="Ativar" value="Ativar"/>		
+					</p:calendar>
+
+					<p:outputLabel value="Status:" />
+					<p:selectOneMenu id="slcRecStaEdit" required="true" value="#{reservaBean.reservaCadastro.status}"
+						converter="statusConverter" filter="true" requiredMessage="O campo Status é Obrigatório">
+						<f:selectItem itemValue="" itemLabel="Selecione:" />
+						<f:selectItems value="#{reservaBean.listaStatus}" var="listaStatus" itemValue="#{listaStatus}"
+							itemLabel="#{listaStatus.nomeStatus}" />
+						<f:validateBean />
+					</p:selectOneMenu>
+
+					<p:commandButton id="btnAdiRecursoEdit" icon="ui-icon-cart" value="Selecionar Recurso" 
+						actionListener="#{reservaBean.pegarDataInicial}" action="reservaBean.pegarDataFinal"
+						type="submit" immediate="true" oncomplete="PF('dlgRecReserCadastrar').show();">
+					</p:commandButton>					
+				</h:panelGrid>
+
+				<h:panelGrid columns="2">
+					<p:commandButton id="btnEditar" value="Editar" title="Editar Reserva"
+						widgetVar="botaoEditar" actionListener="#{reservaBean.editar}"
+						update=":msgAviso :frmReservaEditar :frmReservaCadastro:tblReserCad" oncomplete="PF('dlgRecReserEditar').hide();">					
+					</p:commandButton>	
+
+					<p:button value="Sair" oncomplete="PF('dlgRecReserEditar').hide();" />
+				</h:panelGrid>			
+			</h:form>
+		</p:dialog>
+		
+	</ui:define>
+</ui:composition>
+
+</html>

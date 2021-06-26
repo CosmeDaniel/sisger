@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition template="/templates/layoutGeral.xhtml">
+
+	<ui:define name="metadata">
+		<f:metadata>
+			<f:event listener="#{funcaoUsuarioBean.carregarPesquisa}" type="preRenderView" />
+			<f:event listener="#{funcaoUsuarioBean.carregarCadastro}" type="preRenderView" />
+			<f:event listener="#{usuarioBean.verificaFuncaoUsuario}" type="preRenderView" />
+
+			<f:viewParam name="funcod" value="#{funcaoUsuarioBean.codigo}" />
+			<f:viewParam name="funacao" value="#{funcaoUsuarioBean.acao}" />
+		</f:metadata>
+	</ui:define>
+
+	<ui:define name="conteudo">
+
+		<p:dialog id="dlgFunMostrar" header="Cadastro de Funções dos Usuarios:"
+			widgetVar="dlgFunMostrar" resizable="false" modal="true"
+			appendTo="@(body)" showEffect="fade" hideEffect="fade" visible="true"
+			draggable="false" closable="false">
+
+			<p:separator />
+
+			<h:form id="frmDlgFunCad">
+				<h:panelGrid id="pnlFuncaoUsuario1" columns="6">
+					<p:outputLabel for="txtNomeFuncaoUsuario" value="Função:" />
+					<p:inputText id="txtNomeFuncaoUsuario" size="20"
+						value="#{funcaoUsuarioBean.funcaoUsuarioCadastro.descricaoFuncaoUsuario}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:commandButton id="btnSalvar" value="Salvar"
+						widgetVar="botaoSalvar" actionListener="#{funcaoUsuarioBean.salvar}"
+						update=":msgAviso :frmDlgFunCad :frmDlgFunCad:tblFunCad" />
+
+					<p:button value="Sair" onclick="PF('dlgFunMostrar').hide();"
+						outcome="/paginas/homerPrincipal.xhtml"/>
+				</h:panelGrid>
+
+				<p:separator />
+
+				<p:dataTable id="tblFunCad" widgetVar="tblFuncaoUsuarioCadastro"
+					value="#{funcaoUsuarioBean.listaFuncaoUsuarios}"
+					filteredValue="#{funcaoUsuarioBean.listaFuncaoUsuariosFiltrados}"
+					emptyMessage="Nenhum registro Encontrado!"
+					var="listaFuncaoUsuariosFiltradas" rows="6" paginator="true"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks}
+						{NextPageLink} {LastPageLink} {Exporters}"
+					style="max-width: 500px; min-width: 500px">
+				
+				<f:facet name="{Exporters}">
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="pdf.png" width="24" title="Emitir Relatórios em PDF"/>
+						<p:dataExporter preProcessor="true" type="pdf" target="tblFunCad"
+							fileName="RelatórioDeFunções" encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="excel.png" width="24" title="Emitir Relatórios em EXCEL"/>
+						<p:dataExporter preProcessor="true" type="xls" target="tblFunCad"
+							fileName="RelatórioDeFunções"  encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="xml.png" width="24" title="Emitir Relatórios em XLM"/>
+						<p:dataExporter preProcessor="true" type="xml" target="tblFunCad"
+							fileName="RelatórioDeFunções"  encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="csv.png" width="24" title="Emitir Relatórios em CSV"/>
+						<p:dataExporter preProcessor="true" type="csv" target="tblFunCad"
+							fileName="RelatórioDeFunções"  encoding="ISO-8859-1"/>
+					</h:commandLink>
+				</f:facet>
+				
+					<p:column headerText="Código" width="10%"
+						filterBy="#{listaFuncaoUsuariosFiltradas.codFuncaoUsuario}"
+						sortBy="#{listaFuncaoUsuariosFiltradas.codFuncaoUsuario}">
+						<h:outputText value="#{listaFuncaoUsuariosFiltradas.codFuncaoUsuario}" />
+					</p:column>
+
+					<p:column headerText="Função" width="20%"
+						filterBy="#{listaFuncaoUsuariosFiltradas.descricaoFuncaoUsuario}"
+						sortBy="#{listaFuncaoUsuariosFiltradas.descricaoFuncaoUsuario}">
+						<h:outputText value="#{listaFuncaoUsuariosFiltradas.descricaoFuncaoUsuario}" />
+					</p:column>
+
+					<p:column headerText="Opções" width="6%" exportable="false">
+						<p:commandButton icon="ui-icon-pencil" title="Editar Função Usuário"
+							oncomplete="PF('dlgFunEditar').show();"
+							actionListener="#{funcaoUsuarioBean.carregarCadastro}"
+							update=":frmDlgFunEdi:pnlFuncaoUsuario :frmDlgFunEdi:pnlFuncaoUsuarioEdi1">
+							<f:param name="codFuncaoUsuario"
+								value="#{listaFuncaoUsuariosFiltradas.codFuncaoUsuario}" />
+							<f:setPropertyActionListener
+								target="#{funcaoUsuarioBean.funcaoUsuarioCadastro}"
+								value="#{listaFuncaoUsuariosFiltradas}" />
+						</p:commandButton>
+
+						<p:commandButton icon="ui-icon-trash" title="Excluir Função Usuário"
+							oncomplete="PF('dlgFunExcluir').show();" rendered="#{usuarioBean.gestor != null}"
+							actionListener="#{funcaoUsuarioBean.carregarCadastro}"
+							update=":frmDlgFunExc:pnlFuncaoUsuarioExc :frmDlgFunExc:pnlFuncaoUsuarioExc1">
+							<f:param name="codFuncaoUsuario" value="#{listaFuncaoUsuariosFiltradas.codFuncaoUsuario}" />
+							<f:setPropertyActionListener target="#{funcaoUsuarioBean.funcaoUsuarioCadastro}"
+								value="#{listaFuncaoUsuariosFiltradas}" />
+						</p:commandButton>
+					</p:column>
+
+				</p:dataTable>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog id="dlgFuneEditar" header="Editar Função dos Usuários:"
+			widgetVar="dlgFunEditar" resizable="false" modal="true"
+			appendTo="@(body)" showEffect="fade" hideEffect="fade"
+			closable="false">
+
+			<p:separator />
+
+			<h:form id="frmDlgFunEdi">
+				<h:panelGrid id="pnlFuncaoUsuario" columns="6">
+					<p:outputLabel for="txtCodFuncaoUsuario" value="Cód.:" />
+					<p:inputText id="txtCodFuncaoUsuario" size="10"
+						value="#{funcaoUsuarioBean.funcaoUsuarioCadastro.codFuncaoUsuario}" readonly="true" />
+				</h:panelGrid>
+
+				<h:panelGrid id="pnlFuncaoUsuarioEdi1" columns="4">
+					<p:outputLabel for="txtNomeFuncaoUsuario" value="Função:" />
+					<p:inputText id="txtNomeFuncaoUsuario" size="20"
+						value="#{funcaoUsuarioBean.funcaoUsuarioCadastro.descricaoFuncaoUsuario}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:commandButton value="Editar"
+						actionListener="#{funcaoUsuarioBean.editar}"
+						update=":msgAviso :frmDlgFunEdi:pnlFuncaoUsuario :frmDlgFunEdi:pnlFuncaoUsuarioEdi1 :frmDlgFunCad:tblFunCad"
+						oncomplete="PF('dlgFunEditar').hide();" />
+					<p:commandButton value="Sair"
+						oncomplete="PF('dlgFunEditar').hide(); PF('dlgFunMostrar').show();">
+						<p:resetInput target="pnlFuncaoUsuario" />
+					</p:commandButton>
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog id="dlgFunExcluir" header="Excluir Função dos Usuários:"
+			widgetVar="dlgFunExcluir" resizable="false" modal="true"
+			appendTo="@(body)" showEffect="fade" hideEffect="fade"
+			closable="false">
+
+			<p:separator />
+
+			<h:form id="frmDlgFunExc">
+				<h:panelGrid id="pnlFuncaoUsuarioExc" columns="6">
+					<p:outputLabel for="txtCodFuncaoUsuarioExc" value="Cód.:" />
+					<p:inputText id="txtCodFuncaoUsuarioExc" size="10"
+						value="#{funcaoUsuarioBean.funcaoUsuarioCadastro.codFuncaoUsuario}" readonly="true" />
+				</h:panelGrid>
+
+				<h:panelGrid id="pnlFuncaoUsuarioExc1" columns="4">
+					<p:outputLabel for="txtNomeFuncaoUsuarioExc" value="Função:" />
+					<p:inputText id="txtNomeFuncaoUsuarioExc" size="20"
+						value="#{funcaoUsuarioBean.funcaoUsuarioCadastro.descricaoFuncaoUsuario}" readonly="true">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:commandButton value="Excluir"
+						actionListener="#{funcaoUsuarioBean.excluir}"
+						update=":msgAviso :frmDlgFunExc:pnlFuncaoUsuarioExc :frmDlgFunExc:pnlFuncaoUsuarioExc1 :frmDlgFunCad:tblFunCad"
+						oncomplete="PF('dlgFunExcluir').hide();" />
+						
+					<p:commandButton value="Sair"
+						oncomplete="PF('dlgFunExcluir').hide(); PF('dlgFunMostrar').show();">
+						<p:resetInput target="pnlFuncaoUsuario" />
+					</p:commandButton>
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+	</ui:define>
+</ui:composition>
+</html>

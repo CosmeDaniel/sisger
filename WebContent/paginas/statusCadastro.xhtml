@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition template="/templates/layoutGeral.xhtml">
+
+	<ui:define name="metadata">
+		<f:metadata>
+			<f:event listener="#{statusBean.carregarPesquisa}" type="preRenderView" />
+			<f:event listener="#{statusBean.carregarCadastro}" type="preRenderView" />
+			<f:event listener="#{usuarioBean.verificaFuncaoUsuario}" type="preRenderView" />
+
+			<f:viewParam name="stacod" value="#{statusBean.codigo}" />
+			<f:viewParam name="statcao" value="#{statusBean.acao}" />
+		</f:metadata>
+	</ui:define>
+
+	<ui:define name="conteudo">
+
+		<p:dialog id="dlgStaMostrar" header="Cadastrar Status:"
+			widgetVar="dlgStaMostrar" resizable="false" modal="true"
+			appendTo="@(body)" showEffect="fade" hideEffect="fade" visible="true"
+			draggable="false" closable="false">
+
+			<p:separator />
+
+			<h:form id="frmDlgStaCad">
+				<h:panelGrid id="pnlStatus" columns="6">
+					<p:outputLabel for="txtCodStatus" value="Código:" />
+					<p:inputText id="txtCodStatus" size="10"
+						value="#{statusBean.statusCadastro.codStatus}" readonly="true">
+						<f:validateBean />
+					</p:inputText>
+				</h:panelGrid>
+
+				<h:panelGrid id="pnlStatus1" columns="6">
+					<p:outputLabel for="txtNomeStatus" value="Status:" />
+					<p:inputText id="txtNomeStatus" size="20"
+						value="#{statusBean.statusCadastro.nomeStatus}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:commandButton id="btnSalvar" value="Salvar"
+						widgetVar="botaoSalvar" actionListener="#{statusBean.salvar}"
+						update=":msgAviso :frmDlgStaCad:txtNomeStatus :frmDlgStaCad:tblStaCad"/>
+
+					<p:button value="Sair" onclick="PF('dlgStaMostrar').hide();"
+						outcome="/paginas/homerPrincipal.xhtml"/>
+				</h:panelGrid>
+
+				<p:separator />
+
+				<p:dataTable id="tblStaCad" widgetVar="tblStatusCadastro"
+					value="#{statusBean.listaStatus}"
+					filteredValue="#{statusBean.listaStatusFiltrados}"
+					emptyMessage="Nenhum registro Encontrado!"
+					var="listaStatusFiltrados" rows="6" paginator="true"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks}
+						{NextPageLink} {LastPageLink} {Exporters}"
+					style="max-width: 500px; min-width: 500px">
+					
+				<f:facet name="{Exporters}">
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="pdf.png" width="24" title="Emitir Relatórios em PDF"/>
+						<p:dataExporter preProcessor="true" type="pdf" target="tblStaCad"
+							fileName="RelatórioDeStatus" encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="excel.png" width="24" title="Emitir Relatórios em EXCEL"/>
+						<p:dataExporter preProcessor="true" type="xls" target="tblStaCad"
+							fileName="RelatórioDeStatus" encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="xml.png" width="24" title="Emitir Relatórios em XLM"/>
+						<p:dataExporter preProcessor="true" type="xml" target="tblStaCad"
+							fileName="RelatórioDeStatus" encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="csv.png" width="24" title="Emitir Relatórios em CSV"/>
+						<p:dataExporter preProcessor="true" type="csv" target="tblStaCad"
+							fileName="RelatórioDeStatus" encoding="ISO-8859-1"/>
+					</h:commandLink>
+				</f:facet>	
+
+					<p:column headerText="Código" width="10%"
+						filterBy="#{listaStatusFiltrados.codStatus}"
+						sortBy="#{listaStatusFiltrados.codStatus}">
+						<h:outputText value="#{listaStatusFiltrados.codStatus}" />
+					</p:column>
+
+					<p:column headerText="Status" width="20%"
+						filterBy="#{listaStatusFiltrados.nomeStatus}"
+						sortBy="#{listaStatusFiltrados.nomeStatus}">
+						<h:outputText value="#{listaStatusFiltrados.nomeStatus}" />
+					</p:column>
+
+					<p:column headerText="Opções" width="6%" exportable="false">
+
+						<p:commandButton icon="ui-icon-pencil" title="Editar Status"
+							oncomplete="PF('dlgStaEditar').show();"
+							actionListener="#{statusBean.carregarCadastro}"
+							update=":frmDlgStaEdi:pnlStatus :frmDlgStaEdi:pnlStatusEdi1">
+							<f:param name="codStatus"
+								value="#{listaStatusFiltrados.codStatus}" />
+							<f:setPropertyActionListener
+								target="#{statusBean.statusCadastro}"
+								value="#{listaStatusFiltrados}" />
+						</p:commandButton>
+
+						<p:commandButton icon="ui-icon-trash" title="Excluir Status"
+							oncomplete="PF('dlgStaExcluir').show();"
+							actionListener="#{statusBean.carregarCadastro}"
+							update=":frmDlgStaExc:pnlStatusExc :frmDlgStaExc:pnlStatusExc1">
+							<f:param name="codStatus"
+								value="#{listaStatusFiltrados.codStatus}" />
+							<f:setPropertyActionListener
+								target="#{statusBean.statusCadastro}"
+								value="#{listaStatusFiltrados}" />
+						</p:commandButton>
+					</p:column>
+
+				</p:dataTable>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog id="dlgStaEditar" header="Editar Status:"
+			widgetVar="dlgStaEditar" resizable="false" modal="true"
+			appendTo="@(body)" showEffect="fade" hideEffect="fade"
+			closable="false">
+
+			<p:separator />
+
+			<h:form id="frmDlgStaEdi">
+				<h:panelGrid id="pnlStatus" columns="5">
+					<p:outputLabel for="txtCodStatus" value="Cód.:" />
+					<p:inputText id="txtCodStatus" size="10"
+						value="#{statusBean.statusCadastro.codStatus}" readonly="true" />
+				</h:panelGrid>
+
+				<h:panelGrid id="pnlStatusEdi1" columns="4">
+					<p:outputLabel for="txtNomeStatus" value="Status:" />
+					<p:inputText id="txtNomeStatus" size="20"
+						value="#{statusBean.statusCadastro.nomeStatus}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:commandButton value="Editar"
+						actionListener="#{statusBean.editar}"
+						update=":msgAviso :frmDlgStaEdi:pnlStatus :frmDlgStaEdi:pnlStatusEdi1 :frmDlgStaCad:tblStaCad"
+						oncomplete="PF('dlgStaEditar').hide();" />
+						
+					<p:commandButton value="Sair"
+						oncomplete="PF('dlgStaEditar').hide(); PF('dlgStaMostrar').show();">
+						<p:resetInput target="pnlStatus" />
+					</p:commandButton>
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog id="dlgStaExcluir" header="Excluir Status:"
+			widgetVar="dlgStaExcluir" resizable="false" modal="true"
+			appendTo="@(body)" showEffect="fade" hideEffect="fade"
+			closable="false">
+
+			<p:separator />
+
+			<h:form id="frmDlgStaExc">
+				<h:panelGrid id="pnlStatusExc" columns="6">
+					<p:outputLabel for="txtCodStatusExc" value="Código:" />
+					<p:inputText id="txtCodStatusExc" size="10"
+						value="#{statusBean.statusCadastro.codStatus}" readonly="true" />
+				</h:panelGrid>
+
+				<h:panelGrid id="pnlStatusExc1" columns="4">
+					<p:outputLabel for="txtNomeStatusExc" value="Status:" />
+					<p:inputText id="txtNomeStatusExc" size="20"
+						value="#{statusBean.statusCadastro.nomeStatus}" readonly="true">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:commandButton value="Excluir"
+						actionListener="#{statusBean.excluir}"
+						update=":msgAviso :frmDlgStaExc:pnlStatusExc :frmDlgStaExc:pnlStatusExc1 :frmDlgStaCad:tblStaCad"
+						oncomplete="PF('dlgStaExcluir').hide();" />
+						
+					<p:commandButton value="Sair"
+						oncomplete="PF('dlgStaExcluir').hide(); PF('dlgStaMostrar').show();">
+						<p:resetInput target="pnlStatus" />
+					</p:commandButton>
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+	</ui:define>
+</ui:composition>
+</html>

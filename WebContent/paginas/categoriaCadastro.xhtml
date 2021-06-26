@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition template="/templates/layoutGeral.xhtml">
+
+	<ui:define name="metadata">
+		<f:metadata>
+			<f:event listener="#{categoriaBean.carregarPesquisa}" type="preRenderView" />
+			<f:event listener="#{categoriaBean.carregarCadastro}" type="preRenderView" />
+			<f:event listener="#{usuarioBean.verificaFuncaoUsuario}" type="preRenderView" />
+
+			<f:viewParam name="catcod" value="#{categoriaBean.codigo}" />
+			<f:viewParam name="catacao" value="#{categoriaBean.acao}" />
+		</f:metadata>
+	</ui:define>
+
+	<ui:define name="conteudo">
+
+		<p:dialog id="dlgCateMostrar" header="Cadastro de Categorias:"
+			widgetVar="dlgCatMostrar" resizable="false" modal="true"
+			appendTo="@(body)" showEffect="fade" hideEffect="fade" visible="true"
+			draggable="false" closable="false">
+
+			<p:separator />
+
+			<h:form id="frmDlgCatCad">
+
+
+				<h:panelGrid id="pnlCategoria1" columns="6">
+					<p:outputLabel for="txtNomeCategoria" value="Categoria:" />
+					<p:inputText id="txtNomeCategoria" size="20"
+						value="#{categoriaBean.categoriaCadastro.nomeCategoria}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:commandButton id="btnSalvar" value="Salvar"
+						widgetVar="botaoSalvar" actionListener="#{categoriaBean.salvar}"
+						update=":msgAviso :frmDlgCatCad :frmDlgCatCad:tblCatCad" />
+
+					<p:button value="Sair" onclick="PF('dlgCatMostrar').hide();"
+						outcome="/paginas/homerPrincipal.xhtml"/>						
+				</h:panelGrid>
+
+				<p:separator />
+
+				<p:dataTable id="tblCatCad" widgetVar="tblCategoriaCadastro"
+					value="#{categoriaBean.listaCategorias}" 
+					filteredValue="#{categoriaBean.listaCategoriasFiltradas}"
+					emptyMessage="Nenhum registro Encontrado!"
+					var="listaCategoriasFiltradas" rows="5" paginator="true"
+					style="max-width: 500px; min-width: 500px" 
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks}
+						{NextPageLink} {LastPageLink} {Exporters}">
+				
+				<f:facet name="{Exporters}">
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="pdf.png" width="24" title="Emitir Relatórios em PDF"/>
+						<p:dataExporter preProcessor="true" type="pdf" target="tblCatCad"
+							fileName="RelatórioDeCategorias" encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="excel.png" width="24" title="Emitir Relatórios em EXCEL"/>
+						<p:dataExporter preProcessor="true" type="xls" target="tblCatCad"
+							fileName="RelatórioDeCategorias" encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="xml.png" width="24" title="Emitir Relatórios em XLM"/>
+						<p:dataExporter preProcessor="true" type="xml" target="tblCatCad"
+							fileName="RelatórioDeCategorias" encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="csv.png" width="24" title="Emitir Relatórios em CSV"/>
+						<p:dataExporter preProcessor="true" type="csv" target="tblCatCad"
+							fileName="RelatórioDeCategoria" encoding="ISO-8859-1"/>
+					</h:commandLink>
+				</f:facet>
+				
+					<p:column headerText="Código" width="10%"
+						filterBy="#{listaCategoriasFiltradas.codCategoria}"
+						sortBy="#{listaCategoriasFiltradas.codCategoria}">
+						<h:outputText value="#{listaCategoriasFiltradas.codCategoria}" />
+					</p:column>
+
+					<p:column headerText="Categoria" width="20%"
+						filterBy="#{listaCategoriasFiltradas.nomeCategoria}"
+						sortBy="#{listaCategoriasFiltradas.nomeCategoria}">
+						<h:outputText value="#{listaCategoriasFiltradas.nomeCategoria}" />
+					</p:column>
+
+					<p:column headerText="Opções" width="6%" exportable="false">
+						<p:commandButton icon="ui-icon-pencil" title="Editar Categoria"
+							oncomplete="PF('dlgCatEditar').show();"
+							actionListener="#{categoriaBean.carregarCadastro}"
+							update=":frmDlgCatEdi:pnlCategoria :frmDlgCatEdi:pnlCategoriaEdi1">
+							<f:param name="codCategoria" value="#{listaCategoriasFiltradas.codCategoria}" />
+							<f:setPropertyActionListener target="#{categoriaBean.categoriaCadastro}"
+								value="#{listaCategoriasFiltradas}" />
+						</p:commandButton>
+
+						<p:commandButton icon="ui-icon-trash" title="Excluir Categoria"
+							oncomplete="PF('dlgCatExcluir').show();"
+							actionListener="#{categoriaBean.carregarCadastro}"
+							update=":frmDlgCatExc:pnlCategoriaExc :frmDlgCatExc:pnlCategoriaExc1"
+							rendered="#{autenticacaoBean.usuarioAutenticado.unidade.unidade == null}">
+							<f:param name="codCategoria" value="#{listaCategoriasFiltradas.codCategoria}" />
+							<f:setPropertyActionListener target="#{categoriaBean.categoriaCadastro}"
+								value="#{listaCategoriasFiltradas}" />
+						</p:commandButton>
+					</p:column>
+
+				</p:dataTable>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog id="dlgCateEditar" header="Editar Categoria:"
+			widgetVar="dlgCatEditar" resizable="false" modal="true"
+			appendTo="@(body)" showEffect="fade" hideEffect="fade"
+			closable="false">
+
+			<p:separator />
+
+			<h:form id="frmDlgCatEdi">
+				<h:panelGrid id="pnlCategoria" columns="6">
+					<p:outputLabel for="txtCodCategoria" value="Cód.:" />
+					<p:inputText id="txtCodCategoria" size="10"
+						value="#{categoriaBean.categoriaCadastro.codCategoria}" readonly="true" />
+				</h:panelGrid>
+
+				<h:panelGrid id="pnlCategoriaEdi1" columns="4">
+					<p:outputLabel for="txtNomeCategoria" value="Categoria:" />
+					<p:inputText id="txtNomeCategoria" size="20"
+						value="#{categoriaBean.categoriaCadastro.nomeCategoria}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:commandButton value="Editar"
+						actionListener="#{categoriaBean.editar}"
+						update=":msgAviso :frmDlgCatEdi:pnlCategoria :frmDlgCatEdi:pnlCategoriaEdi1 :frmDlgCatCad:tblCatCad"
+						oncomplete="PF('dlgCatEditar').hide();" />
+						
+					<p:commandButton value="Sair"
+						oncomplete="PF('dlgCatEditar').hide(); PF('dlgCatMostrar').show();">
+						<p:resetInput target="pnlCategoria" />
+					</p:commandButton>
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog id="dlgCateExcluir" header="Excluir Categorias:"
+			widgetVar="dlgCatExcluir" resizable="false" modal="true"
+			appendTo="@(body)" showEffect="fade" hideEffect="fade"
+			closable="false">
+
+			<p:separator />
+
+			<h:form id="frmDlgCatExc">
+				<h:panelGrid id="pnlCategoriaExc" columns="6">
+					<p:outputLabel for="txtCodCategoriaExc" value="Cód.:" />
+					<p:inputText id="txtCodCategoriaExc" size="10"
+						value="#{categoriaBean.categoriaCadastro.codCategoria}" readonly="true" />
+				</h:panelGrid>
+
+				<h:panelGrid id="pnlCategoriaExc1" columns="4">
+					<p:outputLabel for="txtNomeCategoriaExc" value="UF.:" />
+					<p:inputText id="txtNomeCategoriaExc" size="20"
+						value="#{categoriaBean.categoriaCadastro.nomeCategoria}" readonly="true">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:commandButton value="Excluir"
+						actionListener="#{categoriaBean.excluir}"
+						update=":msgAviso :frmDlgCatExc:pnlCategoriaExc :frmDlgCatExc:pnlCategoriaExc1 :frmDlgCatCad:tblCatCad"
+						oncomplete="PF('dlgCatExcluir').hide();" />
+						
+					<p:commandButton value="Sair"
+						oncomplete="PF('dlgCatExcluir').hide(); PF('dlgCatMostrar').show();">
+						<p:resetInput target="pnlCategoria" />
+					</p:commandButton>
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+	</ui:define>
+</ui:composition>
+</html>

@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition template="/templates/layoutGeral.xhtml">
+
+	<ui:define name="metadata">
+		<f:metadata>
+			<f:event listener="#{usuarioBean.carregarPesquisa}"	type="preRenderView" />
+			<f:event listener="#{usuarioBean.carregarCadastro}"	type="preRenderView" />
+			<f:event listener="#{usuarioBean.verificaFuncaoUsuario}" type="preRenderView" />
+
+			<f:viewParam name="Usucod" value="#{usuarioBean.codigo}" />
+			<f:viewParam name="Usuacao" value="#{usuarioBean.acao}" />
+			<f:viewParam name="stacod" value="#{statusBean.codigo}" />
+			<f:viewParam name="statcao" value="#{statusBean.acao}" />
+			<f:viewParam name="subcod" value="#{subCategoriaBean.codigo}" />
+			<f:viewParam name="subCcao" value="#{subCategoriaBean.acao}" />
+
+		</f:metadata>
+	</ui:define>
+
+	<ui:define name="conteudo">
+
+		<p:dialog id="dlgUsuaMostrar" header="Dados do Usuários:"
+			widgetVar="dlgUsiMostrar" resizable="false" modal="true"
+			appendTo="@(body)" showEffect="fade" hideEffect="fade" visible="true"
+			draggable="false" closable="true">
+
+			<h:form id="frmDlgUsiCad">
+
+				<p:dataTable id="tblUsiCad" widgetVar="tblUsuarioCadastro"
+					value="#{autenticacaoBean.usuarioAutenticado}" emptyMessage="Nenhum registro Encontrado!"
+					var="listaUsuariosFiltrados" rows="4" rowKey="#{listaUsuariosFiltrados.codUsuario}"
+					selection="#{usuarioBean.selecaoUsuario}" selectionMode="single"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks}
+						{NextPageLink} {LastPageLink} {Exporters}"
+					style="max-width: 700px; min-width: 700px">
+					
+				<f:facet name="{Exporters}">
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="pdf.png" width="24" title="Emitir Relatórios em PDF"/>
+						<p:dataExporter preProcessor="true" type="pdf" target="tblUsiCad"
+							fileName="RelatórioDeUsuários" encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="excel.png" width="24" title="Emitir Relatórios em EXCEL"/>
+						<p:dataExporter preProcessor="true" type="xls" target="tblUsiCad"
+							fileName="RelatórioDeUsuários" encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="xml.png" width="24" title="Emitir Relatórios em XLM"/>
+						<p:dataExporter preProcessor="true" type="xml" target="tblUsiCad"
+							fileName="RelatórioDeUsuários" encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="csv.png" width="24" title="Emitir Relatórios em CSV"/>
+						<p:dataExporter preProcessor="true" type="csv" target="tblUsiCad"
+							fileName="RelatórioDeUsuários" encoding="ISO-8859-1"/>
+					</h:commandLink>
+				</f:facet>	
+
+					<p:column headerText="CPF" width="15%">
+						<h:outputText value="#{listaUsuariosFiltrados.cpfUsuario}" />
+					</p:column>
+
+					<p:column headerText="Nome">
+						<h:outputText value="#{listaUsuariosFiltrados.nomeUsuario}" />
+					</p:column>
+
+					<p:column headerText="Função" width="20%">
+						<h:outputText value="#{listaUsuariosFiltrados.funcaoUsuario.descricaoFuncaoUsuario}" />
+					</p:column>
+
+					<p:column headerText="Status" width="15%">
+						<h:outputText value="#{listaUsuariosFiltrados.status.nomeStatus}" />
+					</p:column>
+
+					<p:column headerText="Editar" width="5%">
+						<p:commandButton icon="ui-icon-pencil" title="Editar Usuário"
+							oncomplete="PF('dlgUsiEditar').show();"
+							action="#{usuarioBean.emitirMsgEdicaoUsuario}"
+							actionListener="#{usuarioBean.carregarCadastro}"
+							update=":msgAviso :frmDlgUsiEdi :frmDlgUsiEdi:pnlUsuarioEdi0 :frmDlgUsiEdi:pnlUsuarioEdi1 :frmDlgUsiEdi:pnlUsuarioEdi2 :frmDlgUsiEdi">
+							<f:param name="codUsuario" value="#{listaUsuariosFiltrados.codUsuario}" />
+							<f:setPropertyActionListener target="#{listaUsuariosFiltrados}"
+								value="#{listaUsuariosFiltrados}" />
+						</p:commandButton>
+					</p:column>
+
+					<f:facet name="footer">
+						<p:commandButton process="tblUsiCad" icon="ui-icon-search"
+							value="Detalhes" oncomplete="PF('dlgUsuMostrar').show()"
+							title="Dados do Usuário" update=":frmDlgUsiCad:dlgUsuarioMostrar :frmDlgUsiCad:UsuDetalhe">
+						</p:commandButton>
+					</f:facet>
+				</p:dataTable>
+			
+			<p:dialog header="Dados do Usuário:" id="dlgUsuarioMostrar"
+				widgetVar="dlgUsuMostrar" resizable="false" modal="true" 
+				appendTo="@(body)"	showEffect="fade" hideEffect="fade">
+			<h:panelGrid id="pngUsuaMostrar">
+				<h:outputText value="Unidade: #{autenticacaoBean.usuarioAutenticado.unidade.razaoSocialUnidade}" />
+			</h:panelGrid>
+
+			<p:separator />
+			
+				 <p:outputPanel id="UsuDetalhe" style="text-align:left;">			
+					<p:panelGrid id="pnlEndMostrar" columns="2">
+						
+						<h:outputText value="Código:" />
+						<p:inputText  size="10" readonly="true"
+									  value="#{autenticacaoBean.usuarioAutenticado.codUsuario}" />
+						
+						<h:outputLabel value="Data Nasc.: " for="txtDtNascUsuario" />
+						<p:inputText  size="10" readonly="true" id="txtDtNascUsuario"
+								value="#{autenticacaoBean.usuarioAutenticado.dataNascimentoUsuario}">
+								<f:convertDateTime pattern="dd/MM/yyyy" timeZone="America/Sao_Paulo" locale="pt_BR"/>
+						</p:inputText>			 
+						
+						<h:outputLabel value="Telefone:" for="txtTelefUsuario" />
+						<p:inputText  size="15" readonly="true" id="txtTelefUsuario"
+									 value="#{autenticacaoBean.usuarioAutenticado.telefoneUsuario}"/>
+						
+						<h:outputLabel value="Login:" for="txtLoginUsuario" />
+						<p:inputText  size="15" readonly="true" id="txtLoginUsuari"
+									  value="#{autenticacaoBean.usuarioAutenticado.loginUsuario}"/>
+						
+						<h:outputLabel value="E-mail:" for="txtCepEndUnidade" />
+						<p:inputText  size="35" readonly="true" id="txtCepEndUnidade"
+									 value="#{autenticacaoBean.usuarioAutenticado.emailUsuario}"/>	
+					</p:panelGrid>
+				</p:outputPanel>			
+			</p:dialog>
+			
+			</h:form>
+		</p:dialog>
+		
+		<p:graphicImage library="images" name="sisger.png" width="100%" height="430px" /> 
+
+		<p:dialog id="dlgUsuaEditar" header="Editar Usuário:"
+			widgetVar="dlgUsiEditar" resizable="false" modal="true"
+			appendTo="@(body)" showEffect="fade" hideEffect="fade"
+			draggable="true">
+
+			<h:panelGrid id="pngUsuEdi">
+				<h:outputText
+					value="Unidade: #{autenticacaoBean.usuarioAutenticado.unidade.razaoSocialUnidade}" />
+			</h:panelGrid>
+
+			<p:separator />
+
+			<h:form id="frmDlgUsiEdi">
+				<h:panelGrid id="pnlUsuarioEdi" columns="6">
+					<p:outputLabel for="txtCodUsuarioEdi" value="Código:" />
+					<p:outputLabel id="txtCodUsuarioEdi" size="10"	value="#{usuarioBean.usuarioCadastro.codUsuario}" />
+				</h:panelGrid>
+
+
+				<h:panelGrid id="pnlUsuarioEdi0" columns="4">
+					<p:outputLabel for="txtNomeUsuarioEdi" value="Nome:" />
+					<p:inputText id="txtNomeUsuarioEdi" size="69"
+						value="#{usuarioBean.usuarioCadastro.nomeUsuario}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:outputLabel for="txtCpfUsuarioEdi" value="CPF.:" />
+					<p:inputMask id="txtCpfUsuarioEdi" size="20" mask="999.999.999-99"
+						value="#{usuarioBean.usuarioCadastro.cpfUsuario}">
+						<f:validateBean />
+					</p:inputMask>
+				</h:panelGrid>
+
+				<h:panelGrid id="pnlUsuarioEdi1" columns="6">
+					<p:outputLabel value="Dt. N.:" />
+					<p:calendar title="Data de Nascimento" size="20"
+						pattern="dd/MM/yyyy" timeZone="America/Sao_Paulo" locale="pt_BR"
+						value="#{usuarioBean.usuarioCadastro.dataNascimentoUsuario}">	
+						<f:convertDateTime pattern="dd/MM/yyyy" timeZone="America/Sao_Paulo"/>
+					</p:calendar>
+					<p:outputLabel for="txtEmailUsuarioEdi" value="E-mail:" />
+					<p:inputText id="txtEmailUsuarioEdi" size="35" title="E-mail"
+						value="#{usuarioBean.usuarioCadastro.emailUsuario}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:outputLabel for="txtTelefoneUsuarioEdi" value="Tele.:" />
+					<p:inputMask id="txtTelefoneUsuarioEdi" size="20"
+						mask="(99)9999-9999" title="Telefone"
+						value="#{usuarioBean.usuarioCadastro.telefoneUsuario}">
+						<f:validateBean />
+					</p:inputMask>
+				</h:panelGrid>
+
+				<h:panelGrid id="pnlUsuarioEdi2" columns="4">
+					<p:outputLabel for="txtLoginUsuarioEdi" value="Login:" />
+					<p:inputText id="txtLoginUsuarioEdi" size="20"
+						value="#{usuarioBean.usuarioCadastro.loginUsuario}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:outputLabel for="txtSenhaUsuarioEdi" value="Senha:" />
+					<p:password for="txtSenhaUsuarioEdi" id="txtSenhaUsuarioEdi"
+						feedback="true" promptLabel="Digite a Senha"
+						weakLabel="Fraca" goodLabel="Média" strongLabel="Forte"
+						size="34" maxlength="8"	value="#{usuarioBean.usuarioCadastro.senhaUsuario}">
+					</p:password>
+				</h:panelGrid>
+
+				<p:separator />
+
+				<h:panelGrid columns="2">
+					<p:commandButton value="Editar"	actionListener="#{usuarioBean.Editar}"
+						update=":msgAviso :frmDlgUsiCad:tblUsiCad"	oncomplete="PF('dlgUsiEditar').hide();"
+						/>
+					
+					<p:commandButton value="Sair"
+						oncomplete="PF('dlgUsiEditar').hide(); PF('dlgUsiMostrar').show();">
+						<p:resetInput target="pnlUsuario" />
+					</p:commandButton>
+				</h:panelGrid>
+				
+				<p:separator />
+				
+			</h:form>
+		</p:dialog>
+
+	</ui:define>
+</ui:composition>
+</html>

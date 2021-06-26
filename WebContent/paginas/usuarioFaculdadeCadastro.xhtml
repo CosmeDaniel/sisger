@@ -1,0 +1,519 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition template="/templates/layoutGeral.xhtml">
+
+	<ui:define name="metadata">
+		<f:metadata>
+			<f:event listener="#{usuarioBean.carregarPesquisa}"	type="preRenderView" />
+			<f:event listener="#{usuarioBean.carregarCadastro}"	type="preRenderView" />
+			<f:event listener="#{unidadeBean.carregarPesquisa}"	type="preRenderView" />
+			<f:event listener="#{unidadeBean.carregarCadastro}"	type="preRenderView" />
+			<f:event listener="#{unidadeBean.carregarPesquisa}"	type="preRenderView" />
+			<f:event listener="#{usuarioBean.verificaFuncaoUsuario}" type="preRenderView" />
+			<f:event listener="#{usuarioBean.carregarListaFuncaoUsuario}" type="preRenderView" />	
+
+			<f:viewParam name="Usucod" value="#{usuarioBean.codigo}" />
+			<f:viewParam name="Usuacao" value="#{usuarioBean.acao}" />
+			<f:viewParam name="stacod" value="#{statusBean.codigo}" />
+			<f:viewParam name="statcao" value="#{statusBean.acao}" />
+			<f:viewParam name="subcod" value="#{subCategoriaBean.codigo}" />
+			<f:viewParam name="subCcao" value="#{subCategoriaBean.acao}" />
+			<f:viewParam name="unicod" value="#{unidadeBean.codigo}" />
+			<f:viewParam name="unicao" value="#{unidadeBean.acao}" />
+
+		</f:metadata>
+	</ui:define>
+
+	<ui:define name="conteudo">
+
+		<p:dialog id="dlgUsuaFacuMostrar" header="Cadastro de Usuarios:"
+			widgetVar="dlgUsiFacuMostrar" resizable="false" modal="true"
+			appendTo="@(body)" showEffect="fade" hideEffect="fade" visible="true"
+			draggable="false" closable="false">
+
+			<h:form id="frmDlgUsiFacuCad">
+				<h:panelGrid id="pngUsuFacuCad" columns="2">
+					<p:outputLabel value="Unidade:" rendered="#{autenticacaoBean.usuarioAutenticado.unidade.unidade == null}"/>
+					<p:selectOneMenu id="slcUnidUsiFacuCad" rendered="#{autenticacaoBean.usuarioAutenticado.unidade.unidade == null}"
+						value="#{usuarioBean.usuarioCadastro.unidade}"
+						converter="unidadeConverter" filter="true">
+						<f:selectItem itemValue="" itemLabel="Selecione Unidade:" />
+						<f:selectItems value="#{usuarioBean.listaUnidade}"
+							var="listaUnidade" itemValue="#{listaUnidade}"
+							itemLabel="#{listaUnidade.razaoSocialUnidade}" />
+						<f:validateBean />
+					</p:selectOneMenu>
+				</h:panelGrid>
+				
+				<p:panelGrid>
+					<p:outputLabel for="txtUnidade" value="Unidade: "
+						rendered="#{autenticacaoBean.usuarioAutenticado.unidade.unidade != null}"/>
+					<p:outputLabel id="txtUnidade" value="#{autenticacaoBean.usuarioAutenticado.unidade.razaoSocialUnidade}"
+						rendered="#{autenticacaoBean.usuarioAutenticado.unidade.unidade != null}"/>
+				</p:panelGrid>
+				
+				<p:separator />
+
+				<h:panelGrid id="pnlUsuarioFacu0" columns="4">
+					<p:outputLabel for="txtNomeUsuarioFacu" value="Nome:" />
+					<p:inputText id="txtNomeUsuarioFacu" size="69"
+						value="#{usuarioBean.usuarioCadastro.nomeUsuario}">
+						<f:validateBean />
+				</p:inputText>
+
+				<p:outputLabel for="txtCpfUsuarioFacu" value="CPF.:" />
+				<p:inputMask id="txtCpfUsuarioFacu" size="20" mask="999.999.999-99"
+					value="#{usuarioBean.usuarioCadastro.cpfUsuario}">
+					<f:validateBean />
+				</p:inputMask>
+				</h:panelGrid>
+
+				<h:panelGrid id="pnlUsuarioFacu1" columns="6">
+					<p:outputLabel value="Dt. N.:" />
+					<p:calendar title="Data de Nascimento" size="20"
+						pattern="dd/MM/yyyy" timeZone="America/Sao_Paulo" locale="pt_BR"
+						value="#{usuarioBean.usuarioCadastro.dataNascimentoUsuario}">
+						<f:convertDateTime pattern="dd/MM/yyyy" timeZone="America/São_Paulo" locale="pt_BR"/>
+					</p:calendar>	
+
+					<p:outputLabel for="txtEmailUsuarioFacu" value="E-mail:" />
+					<p:inputText id="txtEmailUsuarioFacu" size="35" title="E-mail"
+						value="#{usuarioBean.usuarioCadastro.emailUsuario}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:outputLabel for="txtTelefoneUsuarioFacu" value="Tele.:" />
+					<p:inputMask id="txtTelefoneUsuarioFacu" size="20"
+						mask="(99)9999-9999" title="Telefone"
+						value="#{usuarioBean.usuarioCadastro.telefoneUsuario}">
+						<f:validateBean />
+					</p:inputMask>
+				</h:panelGrid>
+
+				<h:panelGrid id="pnlUsuarioFacu2" columns="4">
+					<p:outputLabel for="txtLoginUsuarioFacu" value="Login:" />
+					<p:inputText id="txtLoginUsuarioFacu" size="20"
+						value="#{usuarioBean.usuarioCadastro.loginUsuario}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:outputLabel for="txtSenhaUsuarioFacu" value="Senha:" />
+					<p:password id="txtSenhaUsuarioFacu" size="35" maxlength="8"
+						feedback="true" promptLabel="Digite a Senha" 
+						weakLabel="Fraca" goodLabel="Média" strongLabel="Forte"
+						value="#{usuarioBean.usuarioCadastro.senhaUsuario}"
+						required="true" requiredMessage="O campo Senha é Obrigatório!">
+						<f:validateBean />
+					</p:password>
+				</h:panelGrid>
+
+				<h:panelGrid id="pnlUsuarioFacu3" columns="6">
+					<p:outputLabel value="Funç.:" />
+					<p:selectOneMenu id="slcFuncUsiFacuCad"
+						value="#{usuarioBean.usuarioCadastro.funcaoUsuario}"
+						converter="funcaoUsuarioConverter" filter="true">
+						<f:selectItem itemValue="" itemLabel="Selecione Função:" />
+						<f:selectItems value="#{usuarioBean.listaFuncaoUsuario}"
+							var="listaFuncaoUsuario" itemValue="#{listaFuncaoUsuario}"
+							itemLabel="#{listaFuncaoUsuario.descricaoFuncaoUsuario}" />
+						<f:validateBean />
+					</p:selectOneMenu>
+
+					<p:outputLabel value="Status:" />
+					<p:selectOneMenu id="slcStaUsiFacuCad"
+						value="#{usuarioBean.usuarioCadastro.status}"
+						converter="statusConverter" filter="true">
+						<f:selectItems value="#{usuarioBean.listaStatus}"
+							var="listaStatus" itemValue="#{listaStatus}"
+							itemLabel="#{listaStatus.nomeStatus}" />
+						<f:validateBean />
+					</p:selectOneMenu>
+				</h:panelGrid>
+
+				<h:panelGrid id="pnlUsuarioFacu4" columns="4">
+					<p:commandButton id="btnSalvar" value="Salvar"
+						widgetVar="botaoSalvar" actionListener="#{usuarioBean.salvar}"
+						update=":msgAviso :frmDlgUsiFacuCad :frmDlgUsiFacuCad:tblUsiFacuCad" />
+
+					<p:button value="Sair"
+						outcome="/paginas/homerPrincipal.xhtml" process="@this">
+					</p:button>
+				</h:panelGrid>
+
+				<p:separator />
+
+				<p:dataTable id="tblUsiFacuCad" widgetVar="tblUsuarioFacuCadastro"
+					value="#{usuarioBean.listaUsuarios}"
+					filteredValue="#{usuarioBean.listaUsuariosFiltrados}"
+					emptyMessage="Nenhum registro Encontrado!"
+					var="listaUsuariosFiltrados" rows="3" paginator="true"
+					rowKey="#{listaUsuariosFiltrados.codUsuario}"
+					selection="#{usuarioBean.selecaoUsuario}" selectionMode="single"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks}
+						{NextPageLink} {LastPageLink} {Exporters}"
+					style="max-width: 700px; min-width: 700px">
+					
+				<f:facet name="{Exporters}">
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="pdf.png" width="24" title="Emitir Relatórios em PDF"/>
+						<p:dataExporter preProcessor="true" type="pdf" target="tblUsiFacuCad"
+							fileName="RelatórioDeUsuários" encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="excel.png" width="24" title="Emitir Relatórios em EXCEL"/>
+						<p:dataExporter preProcessor="true" type="xls" target="tblUsiFacuCad"
+							fileName="RelatórioDeUsuários" encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="xml.png" width="24" title="Emitir Relatórios em XLM"/>
+						<p:dataExporter preProcessor="true" type="xml" target="tblUsiFacuCad"
+							fileName="RelatórioDeUsuários" encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="csv.png" width="24" title="Emitir Relatórios em CSV"/>
+						<p:dataExporter preProcessor="true" type="csv" target="tblUsiFacuCad"
+							fileName="RelatórioDeUsuários" encoding="ISO-8859-1"/>
+					</h:commandLink>
+				</f:facet>	
+
+					<p:column headerText="CPF" width="15%"
+						filterBy="#{listaUsuariosFiltrados.cpfUsuario}"
+						sortBy="#{listaUsuariosFiltrados.cpfUsuario}">
+						<h:outputText value="#{listaUsuariosFiltrados.cpfUsuario}" />
+					</p:column>
+
+					<p:column headerText="Nome"
+						filterBy="#{listaUsuariosFiltrados.nomeUsuario}"
+						sortBy="#{listaUsuariosFiltrados.nomeUsuario}">
+						<h:outputText value="#{listaUsuariosFiltrados.nomeUsuario}" />
+					</p:column>
+
+					<p:column headerText="Função" width="20%"
+						filterBy="#{listaUsuariosFiltrados.funcaoUsuario}"
+						sortBy="#{listaUsuariosFiltrados.funcaoUsuario}">
+						<h:outputText
+							value="#{listaUsuariosFiltrados.funcaoUsuario.descricaoFuncaoUsuario}" />
+					</p:column>
+
+					<p:column headerText="Status" width="15%"
+						filterBy="#{listaUsuariosFiltrados.status.nomeStatus}"
+						sortBy="#{listaUsuariosFiltrados.status.nomeStatus}">
+						<h:outputText value="#{listaUsuariosFiltrados.status.nomeStatus}" />
+					</p:column>
+
+					<p:column headerText="Opções" width="10%" exportable="false">
+						<p:commandButton icon="ui-icon-pencil" title="Editar Usuário"
+							oncomplete="PF('dlgUsiFacuEditar').show();"
+							actionListener="#{usuarioBean.carregarCadastro}"
+							update=":frmDlgUsiFacuEdi ">
+							<f:param name="codUsuario"	value="#{listaUsuariosFiltrados.codUsuario}" />
+							<f:setPropertyActionListener target="#{usuarioBean.usuarioCadastro}"
+								value="#{listaUsuariosFiltrados}" />
+						</p:commandButton>
+
+						<p:commandButton icon="ui-icon-trash" title="Excluir Usuário"
+							oncomplete="PF('dlgUsiFacuExcluir').show();"
+							actionListener="#{usuarioBean.carregarCadastro}"
+							update=":frmDlgUsiFacuExc :frmDlgUsiFacuExc:pnlUsuarioExcFacu0 :frmDlgUsiFacuExc:pnlUsuarioExcFacu1 :frmDlgUsiFacuExc:pnlUsuarioExcFacu2 :frmDlgUsiFacuExc:pnlUsuarioExcFacu3">
+							<f:param name="codUsuario" value="#{listaUsuariosFiltrados.codUsuario}" />
+							<f:setPropertyActionListener target="#{usuarioBean.usuarioCadastro}"
+								value="#{listaUsuariosFiltrados}" />
+						</p:commandButton>
+					</p:column>
+
+					<f:facet name="footer">
+						<p:commandButton process="tblUsiFacuCad" icon="ui-icon-search"
+							value="Detalhes" oncomplete="PF('dlgUsuFacuMostrar').show()"
+							title="Para vizualizar os Dados do Usuário, selecione uma Linha da Tabela!"
+							update=":frmDlgUsiFacuCad:dlgUsuarioFacuMostrar :frmDlgUsiFacuCad:UsuFacuDetalhe">
+						</p:commandButton>
+					</f:facet>
+				</p:dataTable>
+
+				<p:dialog header="Dados do Usuário:" id="dlgUsuarioFacuMostrar"
+					widgetVar="dlgUsuFacuMostrar" resizable="false" modal="true"
+					appendTo="@(body)" showEffect="fade" hideEffect="fade">
+					<h:panelGrid id="pngUsuaFacuMostrar">
+						<h:outputText
+							value="Unidade: #{usuarioBean.selecaoUsuario.unidade.razaoSocialUnidade}" />
+					</h:panelGrid>
+
+					<p:separator />
+
+					<p:outputPanel id="UsuFacuDetalhe" style="text-align:left;">
+						<p:panelGrid id="pnlEndFacuMostrar" columns="2">
+
+							<h:outputText value="Código:" />
+							<p:inputText size="10" readonly="true"
+								value="#{usuarioBean.selecaoUsuario.codUsuario}" />
+
+							<h:outputLabel value="Data Nasc.: " for="txtDtNascUsuarioFacu" />
+							<p:inputText size="10" readonly="true" id="txtDtNascUsuarioFacu"
+								value="#{usuarioBean.selecaoUsuario.dataNascimentoUsuario}">
+								<f:convertDateTime pattern="dd/MM/yyyy" timeZone="America/Sao_Paulo" locale="pt_BR"/>
+							</p:inputText>	
+
+							<h:outputLabel value="Telefone:" for="txtTelefUsuarioFacu" />
+							<p:inputText size="15" readonly="true" id="txtTelefUsuarioFacu"
+								value="#{usuarioBean.selecaoUsuario.telefoneUsuario}" />
+
+							<h:outputLabel value="Login:" for="txtLoginUsuarioFacu" />
+							<p:inputText size="15" readonly="true" id="txtLoginUsuariFacu"
+								value="#{usuarioBean.selecaoUsuario.loginUsuario}" />
+
+							<h:outputLabel value="E-mail:" for="txtCepEndUnidadeFacu" />
+							<p:inputText size="35" readonly="true" id="txtCepEndUnidadeFacu"
+								value="#{usuarioBean.selecaoUsuario.emailUsuario}" />
+						</p:panelGrid>
+					</p:outputPanel>
+				</p:dialog>
+
+			</h:form>
+		</p:dialog>
+
+		<p:dialog id="dlgUsuaFacuEditar" header="Editar Usuário:"
+			widgetVar="dlgUsiFacuEditar" resizable="false" modal="true"
+			appendTo="@(body)" showEffect="fade" hideEffect="fade"
+			draggable="true">
+
+			<h:form id="frmDlgUsiFacuEdi">			
+				<h:panelGrid id="pngUsuFacuCad" columns="2">
+					<p:outputLabel value="Unidade:" rendered="#{autenticacaoBean.usuarioAutenticado.unidade.unidade == null}"/>
+					<p:selectOneMenu id="slcUnidUsiFacuCad" rendered="#{autenticacaoBean.usuarioAutenticado.unidade.unidade == null}"
+						value="#{usuarioBean.usuarioCadastro.unidade}"
+						converter="unidadeConverter" filter="true">
+						<f:selectItem itemValue="" itemLabel="Selecione Unidade:" />
+						<f:selectItems value="#{usuarioBean.listaUnidade}"
+							var="listaUnidade" itemValue="#{listaUnidade}"
+							itemLabel="#{listaUnidade.razaoSocialUnidade}" />
+						<f:validateBean />
+					</p:selectOneMenu>
+				</h:panelGrid>
+				
+				<p:panelGrid>
+					<p:outputLabel for="txtUnidade" value="Unidade: "
+						rendered="#{autenticacaoBean.usuarioAutenticado.unidade.unidade != null}"/>
+					<p:outputLabel id="txtUnidade" value="#{autenticacaoBean.usuarioAutenticado.unidade.razaoSocialUnidade}"
+						rendered="#{autenticacaoBean.usuarioAutenticado.unidade.unidade != null}"/>
+				</p:panelGrid>
+
+				<p:separator />
+
+				<h:panelGrid id="pnlUsuarioFacuEdi" columns="6">
+					<p:outputLabel for="txtCodUsuarioFacuEdi" value="Código:" />
+					<p:outputLabel id="txtCodUsuarioFacuEdi" size="10"
+						value="#{usuarioBean.usuarioCadastro.codUsuario}" />
+				</h:panelGrid>
+
+
+				<h:panelGrid id="pnlUsuarioEdiFacu0" columns="4">
+					<p:outputLabel for="txtNomeUsuarioFacuEdi" value="Nome:" />
+					<p:inputText id="txtNomeUsuarioFacuEdi" size="69"
+						value="#{usuarioBean.usuarioCadastro.nomeUsuario}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:outputLabel for="txtCpfUsuarioFacuEdi" value="CPF.:" />
+					<p:inputMask id="txtCpfUsuarioFacuEdi" size="20"
+						mask="999.999.999-99"
+						value="#{usuarioBean.usuarioCadastro.cpfUsuario}">
+						<f:validateBean />
+					</p:inputMask>
+				</h:panelGrid>
+
+				<h:panelGrid id="pnlUsuarioEdiFacu1" columns="6">
+					<p:outputLabel value="Dt. N.:" />
+					<p:calendar title="Data de Nascimento" size="20"
+						pattern="dd/MM/yyyy" timeZone="America/Sao_Paulo" locale="pt_BR"
+						value="#{usuarioBean.usuarioCadastro.dataNascimentoUsuario}" />
+
+					<p:outputLabel for="txtEmailUsuarioFacuEdi" value="E-mail:" />
+					<p:inputText id="txtEmailUsuarioFacuEdi" size="35" title="E-mail"
+						value="#{usuarioBean.usuarioCadastro.emailUsuario}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:outputLabel for="txtTelefoneUsuarioFacuEdi" value="Tele.:" />
+					<p:inputMask id="txtTelefoneUsuarioFacuEdi" size="20"
+						mask="(99)9999-9999" title="Telefone"
+						value="#{usuarioBean.usuarioCadastro.telefoneUsuario}">
+						<f:validateBean />
+					</p:inputMask>
+				</h:panelGrid>
+
+				<h:panelGrid id="pnlUsuarioEdiFacu2" columns="4">
+					<p:outputLabel for="txtLoginUsuarioFacuEdi" value="Login:" />
+					<p:inputText id="txtLoginUsuarioFacuEdi" size="20"
+						value="#{usuarioBean.usuarioCadastro.loginUsuario}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:outputLabel for="txtSenhaUsuarioFacuEdi" value="Senha:" />
+					<p:password for="txtSenhaUsuarioFacuEdi" id="txtSenhaUsuarioFacuEdi" size="34" maxlength="8"
+						feedback="true" promptLabel="Digite a Senha" immediate="true"
+						weakLabel="Fraca" goodLabel="Média" strongLabel="Forte"
+						value="#{usuarioBean.usuarioCadastro.senhaUsuario}">
+					</p:password>
+				</h:panelGrid>
+
+				<h:panelGrid id="pnlUsuarioEdiFacu3" columns="6">
+					<p:outputLabel value="Funç.:" />
+					<p:selectOneMenu id="slcFuncUsiFacuEdi"
+						value="#{usuarioBean.usuarioCadastro.funcaoUsuario}"
+						converter="funcaoUsuarioConverter" filter="true">
+						<f:selectItem itemValue="" itemLabel="Selecione Função:" />
+						<f:selectItems value="#{usuarioBean.listaFuncaoUsuario}"
+							var="listaFuncaoUsuario" itemValue="#{listaFuncaoUsuario}"
+							itemLabel="#{listaFuncaoUsuario.descricaoFuncaoUsuario}" />
+						<f:validateBean />
+					</p:selectOneMenu>
+
+					<p:outputLabel value="Status:" />
+					<p:selectOneMenu id="slcStaUsiFacuEdi"
+						value="#{usuarioBean.usuarioCadastro.status}"
+						converter="statusConverter" filter="true">
+						<f:selectItem itemValue="" itemLabel="Selecione Status:" />
+						<f:selectItems value="#{usuarioBean.listaStatus}"
+							var="listaStatus" itemValue="#{listaStatus}"
+							itemLabel="#{listaStatus.nomeStatus}" />
+						<f:validateBean />
+					</p:selectOneMenu>
+				</h:panelGrid>
+
+				<p:separator />
+
+				<h:panelGrid columns="2">
+					<p:commandButton value="Editar"	actionListener="#{usuarioBean.Editar}"
+						update=":msgAviso :frmDlgUsiFacuCad:tblUsiFacuCad"
+						oncomplete="PF('dlgUsiFacuEditar').hide();"/>
+						
+					<p:commandButton value="Sair"
+						oncomplete="PF('dlgUsiFacuEditar').hide(); PF('dlgUsiFacuMostrar').show();">
+						<p:resetInput target="pnlUsuarioFacu" />
+					</p:commandButton>
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog id="dlgUsuaFacuExcluir" header="Excluir Usuário:"
+			widgetVar="dlgUsiFacuExcluir" resizable="false" modal="true"
+			appendTo="@(body)" showEffect="fade" hideEffect="fade"
+			draggable="true">
+			<h:panelGrid id="pngUsuFacuExc">
+				<h:outputText
+					value="Unidade: #{autenticacaoBean.usuarioAutenticado.unidade.razaoSocialUnidade}" />
+			</h:panelGrid>
+
+			<p:separator />
+
+			<h:form id="frmDlgUsiFacuExc">
+				<h:panelGrid id="pnlUsuarioFacuExc" columns="6">
+					<p:outputLabel for="txtCodUsuarioFacuExc" value="Código:" />
+					<p:outputLabel id="txtCodUsuarioFacuExc" size="10"
+						value="#{usuarioBean.usuarioCadastro.codUsuario}" />
+				</h:panelGrid>
+
+
+				<h:panelGrid id="pnlUsuarioExcFacu0" columns="4">
+					<p:outputLabel for="txtNomeUsuarioFacuExc" value="Nome:" />
+					<p:inputText id="txtNomeUsuarioFacuExc" size="69" readonly="true"
+						value="#{usuarioBean.usuarioCadastro.nomeUsuario}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:outputLabel for="txtCpfUsuarioFacuExc" value="CPF.:" />
+					<p:inputMask id="txtCpfUsuarioFacuExc" size="20"
+						mask="999.999.999-99" readonly="true"
+						value="#{usuarioBean.usuarioCadastro.cpfUsuario}">
+						<f:validateBean />
+					</p:inputMask>
+				</h:panelGrid>
+
+				<h:panelGrid id="pnlUsuarioExcFacu1" columns="6">
+					<p:outputLabel value="Dt. N.:" />
+					<p:calendar title="Data de Nascimento" size="20"
+						pattern="dd/MM/yyyy" timeZone="America/Sao_Paulo" locale="pt_BR"
+						readonly="true"	value="#{usuarioBean.usuarioCadastro.dataNascimentoUsuario}">
+						<f:convertDateTime pattern="dd/MM/yyyy" timeZone="pt_BR"/>
+					</p:calendar>	
+
+					<p:outputLabel for="txtEmailUsuarioFacuExc" value="E-mail:" />
+					<p:inputText id="txtEmailUsuarioFacuExc" size="35" title="E-mail"
+						readonly="true"
+						value="#{usuarioBean.usuarioCadastro.emailUsuario}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:outputLabel for="txtTelefoneUsuarioFacuExc" value="Tele.:" />
+					<p:inputMask id="txtTelefoneUsuarioFacuExc" size="20"
+						mask="(99)9999-9999" title="Telefone" readonly="true"
+						value="#{usuarioBean.usuarioCadastro.telefoneUsuario}">
+						<f:validateBean />
+					</p:inputMask>
+				</h:panelGrid>
+
+				<h:panelGrid id="pnlUsuarioExcFacu2" columns="4">
+					<p:outputLabel for="txtLoginUsuarioFacuExc" value="Login:" />
+					<p:inputText id="txtLoginUsuarioFacuExc" size="20" readonly="true"
+						value="#{usuarioBean.usuarioCadastro.loginUsuario}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:outputLabel id="txtSenhaUsuariFaExc" value="Senha:" />
+					<p:password for="txtSenhaUsuarioFacExc" id="txtSenhaUsuarioExc"
+						size="34" maxlength="8" readonly="true"
+						value="#{usuarioBean.usuarioCadastro.senhaUsuario}">
+					</p:password>
+				</h:panelGrid>
+
+				<h:panelGrid id="pnlUsuarioExcFacu3" columns="6">
+					<p:outputLabel value="Funç.:" />
+					<p:selectOneMenu id="slcFuncUsiFacuExc"
+						value="#{usuarioBean.usuarioCadastro.funcaoUsuario}"
+						converter="funcaoUsuarioConverter" filter="true">
+						<f:selectItem itemValue="" itemLabel="Selecione Função:" />
+						<f:selectItems value="#{usuarioBean.listaFuncaoUsuario}"
+							var="listaFuncaoUsuario" itemValue="#{listaFuncaoUsuario}"
+							itemLabel="#{listaFuncaoUsuario.descricaoFuncaoUsuario}" />
+						<f:validateBean />
+					</p:selectOneMenu>
+
+					<p:outputLabel value="Status:" />
+					<p:selectOneMenu id="slcStaUsiFacuExc"
+						value="#{usuarioBean.usuarioCadastro.status}"
+						converter="statusConverter" filter="true">
+						<f:selectItem itemValue="" itemLabel="Selecione Status:" />
+						<f:selectItems value="#{usuarioBean.listaStatus}"
+							var="listaStatus" itemValue="#{listaStatus}"
+							itemLabel="#{listaStatus.nomeStatus}" />
+						<f:validateBean />
+					</p:selectOneMenu>
+				</h:panelGrid>
+
+				<p:separator />
+
+				<h:panelGrid columns="2">
+					<p:commandButton value="Excluir"
+						actionListener="#{usuarioBean.Excluir}"
+						update=":msgAviso :frmDlgUsiFacuCad:tblUsiFacuCad"
+						oncomplete="PF('dlgUsiFacuExcluir').hide();" />
+					<p:commandButton value="Sair"
+						oncomplete="PF('dlgUsiFacuExcluir').hide(); PF('dlgUsiFacuMostrar').show();">
+						<p:resetInput target="pnlUsuarioFacu" />
+					</p:commandButton>
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+	</ui:define>
+</ui:composition>
+</html>

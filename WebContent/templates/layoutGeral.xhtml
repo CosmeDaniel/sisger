@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Informando versão do xml usado e Linguagem adotada -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<!-- Inportando Pacotes com os objetos -->
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:insert name="metadata"/>
+	<ui:define name="metadata">
+		<f:metadata>
+			<f:event listener="#{usuarioBean.verificaFuncaoUsuario}" type="preRenderView" />
+		</f:metadata>
+	</ui:define>
+
+<!-- Cabeçalho da Página -->
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UFT-8" />
+	<title>Sisger-OnLine</title>
+	<h:outputStylesheet library="css" name="estilos.css" />
+	<h:outputScript library="js" name="calendarLocale.js" />
+</h:head>
+<h:body>
+	<p:notificationBar position="top" effect="slide" styleClass="top" widgetVar="bar">
+    	<h:outputText value="SISGER - Sistema de Gestão de Recursos" style="font-size:22px;" />
+   
+    <p:separator/>
+    
+    	<h:panelGrid columns="9">
+    		<h:outputLabel value="Desenvolvido: "/>
+    			<h:outputText value="NetWork Soluções Tecnológicas"  />	<p:spacer width="100" height="10" />
+
+			<h:outputLabel value="Tecnologias: "/>
+    			<h:outputText value="MySQL-6.0.9, Java EE, PrimeFaces-5.1"  /> 	<p:spacer width="100" height="10" />	
+
+    		<h:outputLabel value="Suporte: "/>
+    			<h:outputText value="suporte@sisger.com.br"  /> <p:spacer width="100" height="10" />
+
+			<h:outputLabel value="Comercial: "/>
+    			<h:outputText value="comercial@sisger.com.br"  /> <p:spacer width="100" height="10" />	
+    	
+			<h:outputLabel value="Versão: "/>
+    			<h:outputText value="v.2015/01-01.0"/> <p:spacer width="100" height="10" />
+    			
+    			<h:outputLabel value="Site: "/>
+    		<h:outputText value="www.networkst.com.br"/> <p:spacer width="100" height="10" />			
+    	</h:panelGrid>
+    	    	
+    </p:notificationBar>
+
+	<p:growl id="msgAviso" sticky="true"/>
+
+	<p:layout fullPage="true">
+
+		<p:layoutUnit position="north" size="102" 
+			resizable="false" closable="true" collapsible="true">		
+			<p:graphicImage library="images" name="bannerSisger.png" width="1355" height="85" /> 
+		</p:layoutUnit>
+
+		<p:layoutUnit position="south"
+			header="Desenvolvido por NetWork Soluções Tecnológicas. © v.2015/01-01.0"
+			resizable="false" closable="false" collapsible="false">
+		</p:layoutUnit>
+
+		<p:layoutUnit position="west" size="200" header="Menu Principal"
+			resizable="false" closable="false" collapsible="false">
+			<h:form>
+				<p:panelMenu>
+					<p:submenu label="Principal">
+						<p:menuitem icon="ui-icon-home" value="Início"
+							outcome="/paginas/homerPrincipal.xhtml" />
+							
+						<p:menuitem icon="ui-icon-close" value="Sair" 
+							action="#{autenticacaoBean.sairSistema}"/>
+					</p:submenu>
+					<p:submenu label="Cadastros" >
+						<p:menuitem icon="ui-icon-script" value="Categoria"
+							outcome="/paginas/categoriaCadastro.xhtml"
+							rendered="#{usuarioBean.gestor != null or
+								usuarioBean.administrador != null}"/>
+
+						<p:menuitem icon="ui-icon-info" value="Cidade"
+							outcome="/paginas/cidadeCadastro.xhtml"
+							rendered="#{usuarioBean.gestor != null}"/>
+
+						<p:menuitem icon="ui-icon-info" value="Estado"
+							outcome="/paginas/estadoCadastro.xhtml"
+							rendered="#{usuarioBean.gestor != null and
+								usuarioBean.administrador == null and
+								usuarioBean.supervisor == null}"/>
+
+						<p:menuitem icon="ui-icon-flag" value="Função"
+							outcome="/paginas/funcaoUsuarioCadastro.xhtml"
+							rendered="#{usuarioBean.gestor != null or
+								usuarioBean.administrador != null and
+								usuarioBean.supervisor == null}"/>
+								
+						<p:menuitem icon="ui-icon-script" value="SubCategoria"
+							outcome="/paginas/subCategoriaCadastro.xhtml"
+							rendered="#{usuarioBean.gestor != null or
+								usuarioBean.administrador != null and
+								usuarioBean.supervisor == null}"/>								
+
+						<p:menuitem icon="ui-icon-print" value="Recurso"
+							outcome="/paginas/recursoCadastro.xhtml"
+							rendered="#{usuarioBean.gestor != null or
+								usuarioBean.administrador != null or
+								usuarioBean.supervisor != null}"/>
+
+						<p:menuitem icon="ui-icon-script" value="Status"
+							outcome="/paginas/statusCadastro.xhtml"
+							rendered="#{usuarioBean.gestor != null and
+								usuarioBean.administrador == null and
+								usuarioBean.supervisor == null}"/>
+
+						<p:menuitem icon="ui-icon-home" value="Faculdade"
+							outcome="/paginas/faculdadeCadastro.xhtml"
+							rendered="#{usuarioBean.gestor != null or
+								usuarioBean.administrador != null and
+								usuarioBean.supervisor == null}"/>	
+											
+						<p:menuitem icon="ui-icon-person" value="Usuário"
+							outcome="/paginas/usuarioFaculdadeCadastro.xhtml"
+							rendered="#{usuarioBean.gestor != null or
+								usuarioBean.administrador != null or
+								usuarioBean.supervisor != null}"/>
+							
+						<p:menuitem icon="ui-icon-person" value="Usuário" outcome="/paginas/usuarioCadastro.xhtml"
+							rendered="#{usuarioBean.visivel == null}"/>	
+					</p:submenu>
+
+					<p:submenu label="Reservas">
+						<p:menuitem icon="ui-icon-pin-s" value="Solicitar"
+							outcome="/paginas/reservaCadastro.xhtml"/>
+					</p:submenu>
+
+					<p:submenu label="Configuração">
+						<p:menuitem icon="ui-icon-gear" value="Layout"
+							outcome="/paginas/configuracao.xhtml"/>
+					</p:submenu>
+				</p:panelMenu>
+			</h:form>
+		</p:layoutUnit>
+
+		<p:layoutUnit position="east" header="Status do Sistema" size="201"
+			resizable="true" closable="true" collapsible="true" effect="drop">
+
+			<p:separator/>
+			
+			<h:panelGrid columns="1">
+				<p:commandButton ondblclick="PF('bar').hide()" value="Sobre o Sistema"
+				onclick="PF('bar').show()" type="button" icon="ui-icon-arrow-1-s"
+				title="De duplo Click para Fechar!" style="max-width: 900px; min-width: 185px"/>
+			</h:panelGrid>			
+			
+			<p:separator/>
+			
+			<h:panelGrid columns="1" width="100%">
+				<p:toolbar>
+					<f:facet name="left">
+						<p:outputLabel value="Faculdade Logada:"/>
+					</f:facet>
+				</p:toolbar>			
+				<h:outputText value="#{autenticacaoBean.usuarioAutenticado.unidade.razaoSocialUnidade}" />
+			</h:panelGrid>
+					
+			<p:separator/>
+			
+			<h:panelGrid columns="1" width="100%">
+				<p:toolbar >
+					<f:facet name="left">
+						<p:outputLabel value="Usuário Logado:" />
+					</f:facet>
+				</p:toolbar>
+				<h:outputText value="#{autenticacaoBean.usuarioAutenticado.nomeUsuario}" />
+			</h:panelGrid>
+				
+			<p:separator />
+				
+			<h:panelGrid columns="1" width="100%">
+				<p:toolbar>
+					<f:facet name="left" >
+						<p:outputLabel value="Função Usuário:"/>
+					</f:facet>
+				</p:toolbar>
+				<h:outputText value="#{autenticacaoBean.usuarioAutenticado.funcaoUsuario.descricaoFuncaoUsuario}" />
+			</h:panelGrid>
+				
+			<p:separator />
+			
+			<h:panelGrid columns="1" width="100%">
+				<p:toolbar>
+					<f:facet name="left">
+						<p:outputLabel value="Data / Hora Atual:"/>
+					</f:facet>
+				</p:toolbar>
+				<p:clock/>
+			</h:panelGrid>
+		
+		</p:layoutUnit>
+
+		<p:layoutUnit position="center">
+			<ui:insert name="conteudo" />
+		</p:layoutUnit>
+
+	</p:layout>
+</h:body>
+</html>

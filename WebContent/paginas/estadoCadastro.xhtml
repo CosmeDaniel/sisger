@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition template="/templates/layoutGeral.xhtml">
+
+	<ui:define name="metadata">
+		<f:metadata>
+			<f:event listener="#{estadoBean.carregarPesquisa}" type="preRenderView" />
+			<f:event listener="#{estadoBean.carregarCadastro}" type="preRenderView" />
+			<f:event listener="#{usuarioBean.verificaFuncaoUsuario}" type="preRenderView" />
+
+			<f:viewParam name="estcod" value="#{estadoBean.codigo}" />
+			<f:viewParam name="estacao" value="#{estadoBean.acao}" />
+		</f:metadata>
+	</ui:define>
+
+	<ui:define name="conteudo">
+
+		<p:dialog id="dlgEstaMostrar" header="Cadastro de Estados:"
+			widgetVar="dlgEstMostrar" resizable="false" modal="true"
+			appendTo="@(body)" showEffect="fade" hideEffect="fade" visible="true"
+			draggable="false" closable="false">
+
+			<p:separator />
+
+			<h:form id="frmDlgEstCad">
+				<h:panelGrid id="pnlEstado" columns="6">
+					<p:outputLabel for="txtCodEstado" value="Cód.:" />
+					<p:inputText id="txtCodEstado" size="10"
+						value="#{estadoBean.estadoCadastro.codEstado}" readonly="true">
+						<f:validateBean />
+					</p:inputText>
+				</h:panelGrid>
+
+				<h:panelGrid id="pnlEstado1" columns="6">
+					<p:outputLabel for="txtUfEstado" value="UF.:" />
+					<p:inputText id="txtUfEstado" size="20"
+						value="#{estadoBean.estadoCadastro.ufEstado}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:commandButton id="btnSalvar" value="Salvar"
+						widgetVar="botaoSalvar" actionListener="#{estadoBean.salvar}"
+						update=":msgAviso :frmDlgEstCad :frmDlgEstCad:tblEstCad" />
+
+					<p:button value="Sair" onclick="PF('dlgEstMostrar').hide();"
+						outcome="/paginas/homerPrincipal.xhtml"/>
+				</h:panelGrid>
+
+				<p:separator />
+
+				<p:dataTable id="tblEstCad" widgetVar="tblEstadoCadastro"
+					value="#{estadoBean.listaEstados}"
+					filteredValue="#{estadoBean.listaEstadosFiltrados}"
+					emptyMessage="Nenhum registro Encontrado!"
+					var="listaEstadosFiltrados" rows="7" paginator="true"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks}
+						{NextPageLink} {LastPageLink} {Exporters}"
+					style="max-width: 500px; min-width: 500px">
+				
+				<f:facet name="{Exporters}">
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="pdf.png" width="24" title="Emitir Relatórios em PDF"/>
+						<p:dataExporter preProcessor="true" type="pdf" target="tblEstCad"
+							fileName="RelatórioDeEstados" encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="excel.png" width="24" title="Emitir Relatórios em EXCEL"/>
+						<p:dataExporter preProcessor="true" type="xls" target="tblEstCad"
+							fileName="RelatórioDeEstados" encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="xml.png" width="24" title="Emitir Relatórios em XLM"/>
+						<p:dataExporter preProcessor="true" type="xml" target="tblEstCad"
+							fileName="RelatórioDeEstados" encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="csv.png" width="24" title="Emitir Relatórios em CSV"/>
+						<p:dataExporter preProcessor="true" type="csv" target="tblEstCad"
+							fileName="RelatórioDeEstados" encoding="ISO-8859-1"/>
+					</h:commandLink>
+				</f:facet>
+	
+					<p:column headerText="Código" width="10%"
+						filterBy="#{listaEstadosFiltrados.codEstado}"
+						sortBy="#{listaEstadosFiltrados.codEstado}">
+						<h:outputText value="#{listaEstadosFiltrados.codEstado}" />
+					</p:column>
+
+					<p:column headerText="UF Estado" width="20%"
+						filterBy="#{listaEstadosFiltrados.ufEstado}"
+						sortBy="#{listaEstadosFiltrados.ufEstado}">
+						<h:outputText value="#{listaEstadosFiltrados.ufEstado}" />
+					</p:column>
+
+					<p:column headerText="Opções" width="6%" exportable="false">
+						<p:commandButton icon="ui-icon-pencil" title="Editar Estado"
+							oncomplete="PF('dlgEstEditar').show();"
+							actionListener="#{estadoBean.carregarCadastro}"
+							update=":frmDlgEstEdi:pnlEstado :frmDlgEstEdi:pnlEstadoEdi1">
+							<f:param name="codEstado" value="#{listaEstadosFiltrados.codEstado}" />
+							<f:setPropertyActionListener target="#{estadoBean.estadoCadastro}"
+								value="#{listaEstadosFiltrados}" />
+						</p:commandButton>
+
+						<p:commandButton icon="ui-icon-trash" title="Excluir Estado"
+							oncomplete="PF('dlgEstExcluir').show();"
+							actionListener="#{estadoBean.carregarCadastro}"
+							update=":frmDlgEstExc:pnlEstadoExc :frmDlgEstExc:pnlEstadoExc1"
+							rendered="#{autenticacaoBean.usuarioAutenticado.unidade.unidade == null}">
+							<f:param name="codEstado"
+								value="#{listaEstadosFiltrados.codEstado}" />
+							<f:setPropertyActionListener
+								target="#{estadoBean.estadoCadastro}"
+								value="#{listaEstadosFiltrados}" />
+						</p:commandButton>
+					</p:column>
+
+				</p:dataTable>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog id="dlgEstaEditar" header="Editar Estados:"
+			widgetVar="dlgEstEditar" resizable="false" modal="true"
+			appendTo="@(body)" showEffect="fade" hideEffect="fade"
+			closable="false">
+
+			<p:separator />
+
+			<h:form id="frmDlgEstEdi">
+				<h:panelGrid id="pnlEstado" columns="6">
+					<p:outputLabel for="txtCodEstado" value="Cód.:" />
+					<p:inputText id="txtCodEstado" size="10"
+						value="#{estadoBean.estadoCadastro.codEstado}" readonly="true" />
+				</h:panelGrid>
+
+				<h:panelGrid id="pnlEstadoEdi1" columns="4">
+					<p:outputLabel for="txtUfEstado" value="UF.:" />
+					<p:inputText id="txtUfEstado" size="20"
+						value="#{estadoBean.estadoCadastro.ufEstado}">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:commandButton value="Editar"
+						actionListener="#{estadoBean.editar}"
+						update=":msgAviso :frmDlgEstEdi:pnlEstado :frmDlgEstEdi:pnlEstadoEdi1 :frmDlgEstCad:tblEstCad"
+						oncomplete="PF('dlgEstEditar').hide();" />
+						
+					<p:commandButton value="Sair"
+						oncomplete="PF('dlgEstEditar').hide(); PF('dlgEstMostrar').show();">
+						<p:resetInput target="pnlEstado" />
+					</p:commandButton>
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+		<p:dialog id="dlgEstaExcluir" header="Excluir Estados:"
+			widgetVar="dlgEstExcluir" resizable="false" modal="true"
+			appendTo="@(body)" showEffect="fade" hideEffect="fade"
+			closable="false">
+
+			<p:separator />
+
+			<h:form id="frmDlgEstExc">
+				<h:panelGrid id="pnlEstadoExc" columns="6">
+					<p:outputLabel for="txtCodEstadoExc" value="Cód.:" />
+					<p:inputText id="txtCodEstadoExc" size="10"
+						value="#{estadoBean.estadoCadastro.codEstado}" readonly="true" />
+				</h:panelGrid>
+
+				<h:panelGrid id="pnlEstadoExc1" columns="4">
+					<p:outputLabel for="txtUfEstadoExc" value="UF.:" />
+					<p:inputText id="txtUfEstadoExc" size="20"
+						value="#{estadoBean.estadoCadastro.ufEstado}" readonly="true">
+						<f:validateBean />
+					</p:inputText>
+
+					<p:commandButton value="Excluir"
+						actionListener="#{estadoBean.excluir}"
+						update=":msgAviso :frmDlgEstExc:pnlEstadoExc :frmDlgEstExc:pnlEstadoExc1 :frmDlgEstCad:tblEstCad"
+						oncomplete="PF('dlgEstExcluir').hide();" />
+						
+					<p:commandButton value="Sair"
+						oncomplete="PF('dlgEstExcluir').hide(); PF('dlgEstMostrar').show();">
+						<p:resetInput target="pnlEstado" />
+					</p:commandButton>
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+	</ui:define>
+</ui:composition>
+</html>

@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition template="/templates/layoutGeral.xhtml">
+	<ui:define name="metadata">
+		<f:metadata>
+			<f:event listener="#{unidadeBean.carregarPesquisa}"	type="preRenderView" />		
+			<f:event listener="#{unidadeBean.carregarCadastro}"	type="preRenderView" />			
+			<f:event listener="#{enderecoBean.carregarCadastro}" type="preRenderView" />
+			<f:event listener="#{enderecoBean.carregarPesquisa}" type="preRenderView" />
+			<f:event listener="#{usuarioBean.verificaFuncaoUsuario}" type="preRenderView" />
+				
+			<f:viewParam name="uniacao" value="#{unidadeBean.acao}" />
+			<f:viewParam name="unicod" value="#{unidadeBean.codigo}" />
+			<f:viewParam name="endacao" value="#{enderecoBean.acao}" />
+			<f:viewParam name="endcod" value="#{enderecoBean.codigo}" />					
+		</f:metadata>
+	</ui:define>
+
+	<ui:define name="conteudo">
+		<h:form id="frmUnidCad">
+			<p:accordionPanel id="acordPanelUnidCad" multiple="true" style="max-width: 100%; min-width: 630px"
+				rendered="#{usuarioBean.administrador == null}">
+				<p:tab title="Cadatro de Faculdades">
+
+					<h:panelGrid id="pnlUnidCad1" columns="4" cellpadding="3">				
+						<p:outputLabel value="R.Social:" />
+						<p:inputText maxlength="50" size="45" value="#{unidadeBean.unidadeCadastro.razaoSocialUnidade}">
+							<f:validateBean />
+						</p:inputText>
+
+						<p:outputLabel value="Cnpj:" />
+						<p:inputMask size="35" mask="99.999.999/9999-99"
+							value="#{unidadeBean.unidadeCadastro.cnpjUnidade}">
+							<f:validateBean />
+						</p:inputMask>
+
+						<p:outputLabel value="Ins. Est.:" />
+						<p:inputMask maxlength="45" size="35" mask="999.999.999/9999"
+							title="Inscrição Estadual"
+							value="#{unidadeBean.unidadeCadastro.inscricaoEstadualUnidade}">
+							<f:validateBean />
+						</p:inputMask>
+
+						<p:outputLabel value="Contato:" />
+						<p:inputText maxlength="45" size="35"
+							value="#{unidadeBean.unidadeCadastro.contatoUnidade}">
+							<f:validateBean />
+						</p:inputText>
+					</h:panelGrid>
+				</p:tab>
+
+				<p:tab title="Endereço:">
+					<h:panelGrid columns="4" cellpadding="3">
+						<p:outputLabel value="Rua:" />
+						<p:inputText maxlength="50" size="45"
+							value="#{enderecoBean.enderecoCadastro.ruaEndereco}">
+							<f:validateBean />
+						</p:inputText>
+
+						<p:outputLabel value="Número:" />
+						<p:inputText maxlength="11" size="15" required="true"
+							requiredMessage="Campo Número é Obrigatório!"
+							value="#{enderecoBean.enderecoCadastro.numeroEndereco}">
+							<f:validateBean />
+						</p:inputText>
+
+						<p:outputLabel value="Comp.:" />
+						<p:inputText maxlength="20" size="25" title="Coplemento Endereço"
+							value="#{enderecoBean.enderecoCadastro.complementoEndereco}" />
+
+						<p:outputLabel value="Bairro:" />
+						<p:inputText maxlength="45" size="35"
+							value="#{enderecoBean.enderecoCadastro.bairroEndereco}">
+							<f:validateBean />
+						</p:inputText>
+
+						<p:outputLabel value="CEP:" />
+						<p:inputMask size="25" mask="99.999-999"
+							value="#{enderecoBean.enderecoCadastro.cepEndereco}">
+							<f:validateBean />
+						</p:inputMask>
+						
+						<p:outputLabel value="Estado:" />
+						<p:selectOneMenu id="slcUnidEstCad" value="#{enderecoBean.enderecoCadastro.cidade.estado}"
+								converter="estadoConverter" filter="true">
+							<p:ajax event="change" listener="#{enderecoBean.listaCidadesPorEstado}"
+							 update=":frmUnidCad:acordPanelUnidCad:slcUnidCidCad"/>
+							<f:selectItem itemValue="" itemLabel="Selecione Estado" />
+							<f:selectItems value="#{enderecoBean.listaEstados}" var="listaEstados"
+								itemValue="#{listaEstados}" itemLabel="#{listaEstados.ufEstado}" />										   
+						</p:selectOneMenu>						
+
+						<p:outputLabel value="Cidade:" />
+						<p:selectOneMenu id="slcUnidCidCad"
+							value="#{enderecoBean.enderecoCadastro.cidade}"
+							converter="cidadeConverter" filter="true">
+							<p:ajax event="change" listener="#{enderecoBean.listaCidadesPorEstado}"
+							process="slcUnidEstCad" />
+							<f:selectItem itemValue="" itemLabel="Selecione Cidade" />
+							<f:selectItems value="#{enderecoBean.listaCidades}"	var="listaCidades"
+								itemValue="#{listaCidades}"	itemLabel="#{listaCidades.nomeCidade}" />
+							<f:validateBean />
+						</p:selectOneMenu>
+
+					</h:panelGrid>
+
+					<h:panelGrid columns="3" cellpadding="3" cellspacing="10">										 
+						<p:commandButton value="Salvar" actionListener="#{enderecoBean.executaSalvarEndUnid}"
+										 update=":msgAviso :frmUnidCad:tblUnidCad :frmUnidCad:acordPanelUnidCad"/>
+						<p:button value="Sair"
+							outcome ="/paginas/homerPrincipal.xhtml?faces-redirect=true"/>
+					</h:panelGrid>
+
+				</p:tab>
+			</p:accordionPanel>
+
+			<p:dataTable id="tblUnidCad" value="#{unidadeBean.listaUnidades}" style="max-width: 100%; min-width: 630px"		
+				filteredValue="#{unidadeBean.listaUnidadesFiltradas}"
+				emptyMessage="Nenhum registro Encontrado!"
+				var="listaUnidadesFiltradas" rows="4" paginator="true" 
+				rowKey="#{listaUnidadesFiltradas.codUnidade}"
+				selection="#{unidadeBean.selecaoUnidade}" selectionMode="single" 
+				paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks}
+						{NextPageLink} {LastPageLink} {Exporters}">
+				
+			<f:facet name="{Exporters}">
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="pdf.png" width="24" title="Emitir Relatórios em PDF"/>
+						<p:dataExporter preProcessor="true" type="pdf" target="tblUnidCad"
+							fileName="RelatórioDeFaculdade" encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="excel.png" width="24" title="Emitir Relatórios em EXCEL"/>
+						<p:dataExporter preProcessor="true" type="xls" target="tblUnidCad"
+							fileName="RelatórioDeFaculdade" encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="xml.png" width="24" title="Emitir Relatórios em XLM"/>
+						<p:dataExporter preProcessor="true" type="xml" target="tblUnidCad"
+							fileName="RelatórioDeFaculdade" encoding="ISO-8859-1"/>
+					</h:commandLink>
+					
+					<h:commandLink immediate="true">
+						<p:graphicImage library="images" name="csv.png" width="24" title="Emitir Relatórios em CSV"/>
+						<p:dataExporter preProcessor="true" type="csv" target="tblUnidCad"
+							fileName="RelatórioDeFaculdade" encoding="ISO-8859-1"/>
+					</h:commandLink>
+				</f:facet>	
+				
+				<p:column headerText="Razão Social"
+					filterBy="#{listaUnidadesFiltradas.razaoSocialUnidade}"
+					sortBy="#{listaUnidadesFiltradas.razaoSocialUnidade}">
+					<h:outputText value="#{listaUnidadesFiltradas.razaoSocialUnidade}" />
+				</p:column>
+
+				<p:column headerText="Cnpj" width="150"
+					filterBy="#{listaUnidadesFiltradas.cnpjUnidade}"
+					sortBy="#{listaUnidadesFiltradas.cnpjUnidade}">
+					<h:outputText value="#{listaUnidadesFiltradas.cnpjUnidade}" />
+				</p:column>
+
+				<p:column headerText="Inscr. Estadual" width="150"
+					filterBy="#{listaUnidadesFiltradas.inscricaoEstadualUnidade}"
+					sortBy="#{listaUnidadesFiltradas.inscricaoEstadualUnidade}">
+					<h:outputText value="#{listaUnidadesFiltradas.inscricaoEstadualUnidade}" />
+				</p:column>
+
+				<p:column headerText="Contato" width="170">
+					<h:outputText value="#{listaUnidadesFiltradas.contatoUnidade}" />
+				</p:column>
+
+				<p:column headerText="Opções" width="69" exportable="false">
+					<p:button icon="ui-icon-pencil" title="Editar Faculdade"
+						outcome="/paginas/faculdadeEditar.xhtml">
+						<f:param name="codUnidade" value="#{listaUnidadesFiltradas.codUnidade}" />
+						<f:param name="codEndereco" value="#{listaUnidadesFiltradas.endereco.codEndereco}" />					
+					</p:button>					
+					
+					<p:button icon="ui-icon-trash" title="Excluir Faculdade"
+						outcome="/paginas/faculdadeEditar.xhtml"
+						rendered="#{unidadeBean.gestorLogado == null}">
+						<f:param name="codUnidade" value="#{listaUnidadesFiltradas.codUnidade}" />
+						<f:param name="codEndereco" value="#{listaUnidadesFiltradas.endereco.codEndereco}" />
+						<f:param name="acaoBotao" value="#{unidadeBean.acaoBotaoExcluir}"/>
+					</p:button>					
+				</p:column>
+				
+       		<f:facet name="header">
+            	<p:commandButton process="tblUnidCad"
+            			icon="ui-icon-search" value="Vizualizar Endereço da Faculdade"
+            			oncomplete="PF('dlgEndMostrar').show()" title="Para Vizualizar o Endereço, selecione a linha na Tabela!"
+            			update=":frmUnidCad:EndDetalhe">		
+			  	</p:commandButton>
+			  	
+			  	<p:commandButton icon="ui-icon-pencil" value="Cadastrar Campi da Faculdade"
+            			oncomplete="PF('dlgCampMostrar').show()" title="Cadastrar Campi da Faculdade"
+            			rendered="#{autenticacaoBean.usuarioAutenticado.unidade.unidade == null}">		
+			  	</p:commandButton>
+       	 	</f:facet> 
+			</p:dataTable>
+			
+			<p:dialog header="Endereço da Unidade:"
+				widgetVar="dlgEndMostrar"
+				resizable="false"
+				modal="true" 
+				appendTo="@(body)"
+	  			showEffect="fade"
+	  			hideEffect="fade">
+			
+				 <p:outputPanel id="EndDetalhe" style="text-align:left;">			
+					<p:panelGrid id="pnlEndMostrar" columns="2">
+						
+						<h:outputText value="Rua/Av.: " />
+						<p:inputText  size="45" readonly="true"
+									  value="#{unidadeBean.selecaoUnidade.endereco.ruaEndereco}" />
+						
+						<h:outputLabel value="Número: " for="txtNumEndUnidade" />
+						<p:inputText  size="10" readonly="true" id="txtNumEndUnidade"
+									 value="#{unidadeBean.selecaoUnidade.endereco.numeroEndereco}"/>
+						
+						<h:outputLabel value="Compl.:" for="txtComplEndUnidade" />
+						<p:inputText  size="25" readonly="true" id="txtComplEndUnidade"
+									 value="#{unidadeBean.selecaoUnidade.endereco.complementoEndereco}"/>
+						
+						<h:outputLabel value="Bairro:" for="txtBairEndUnidade" />
+						<p:inputText   size="45" readonly="true" id="txtBairEndUnidade"
+									  value="#{unidadeBean.selecaoUnidade.endereco.bairroEndereco}"/>
+						
+						<h:outputLabel value="Cep: " for="txtCepEndUnidade" />
+						<p:inputText  size="25" readonly="true" id="txtCepEndUnidade"
+									 value="#{unidadeBean.selecaoUnidade.endereco.cepEndereco}"/>
+	
+						<h:outputLabel value="Cidade: " for="txtCidEndUnidade" />
+						<p:inputText  size="45" readonly="true" id="txtCidEndUnidade"
+									  value="#{unidadeBean.selecaoUnidade.endereco.cidade.nomeCidade}"/>
+	
+						<h:outputLabel value="Estado: " for="txtEstEndUnidade" />
+						<p:inputText size="10" readonly="true" id="txtEstEndUnidade"
+									 value="#{unidadeBean.selecaoUnidade.endereco.cidade.estado.ufEstado}"/>			
+					</p:panelGrid>
+				</p:outputPanel>				
+			</p:dialog>
+		</h:form>					
+
+		<p:dialog widgetVar="dlgCampMostrar" resizable="false" modal="true"
+				appendTo="@(body)" showEffect="fade" hideEffect="fade" closable="true"
+				header="#{autenticacaoBean.usuarioAutenticado.unidade.razaoSocialUnidade}">
+				
+				<h:form id="frmDlgCampCad">
+				<p:accordionPanel id="acordPanelCampCad" multiple="true">
+					<p:tab title="Cadatro de Câmpus da Faculdade.">
+
+						<h:panelGrid id="pnlCampCad1" columns="4" cellpadding="3">
+							<p:outputLabel value="R.Social:" />
+							<p:inputText maxlength="50" size="45"
+								value="#{unidadeBean.unidadeCadastro.razaoSocialUnidade}">
+								<f:validateBean />
+							</p:inputText>
+
+							<p:outputLabel value="Cnpj:" />
+							<p:inputMask size="35" mask="99.999.999/9999-99"
+								value="#{unidadeBean.unidadeCadastro.cnpjUnidade}">
+								<f:validateBean />
+							</p:inputMask>
+
+							<p:outputLabel value="Ins. Est.:" />
+							<p:inputMask maxlength="45" size="35" mask="999.999.999/9999"
+								title="Inscrição Estadual"
+								value="#{unidadeBean.unidadeCadastro.inscricaoEstadualUnidade}">
+								<f:validateBean />
+							</p:inputMask>
+
+							<p:outputLabel value="Contato:" />
+							<p:inputText maxlength="45" size="35"
+								value="#{unidadeBean.unidadeCadastro.contatoUnidade}">
+								<f:validateBean />
+							</p:inputText>
+						</h:panelGrid>
+					</p:tab>
+
+					<p:tab title="Endereço" titletip="Click para abrir Cadastro de Endereço.">
+						<h:panelGrid columns="4" cellpadding="3">
+							<p:outputLabel value="Rua:" />
+							<p:inputText maxlength="50" size="45"
+								value="#{enderecoBean.enderecoCadastro.ruaEndereco}">
+								<f:validateBean />
+							</p:inputText>
+
+							<p:outputLabel value="Número:" />
+							<p:inputText maxlength="11" size="15" required="true"
+								requiredMessage="Campo Número é Obrigatório!"
+								value="#{enderecoBean.enderecoCadastro.numeroEndereco}">
+								<f:validateBean />
+							</p:inputText>
+
+							<p:outputLabel value="Comp.:" />
+							<p:inputText maxlength="20" size="25" title="Coplemento Endereço"
+								value="#{enderecoBean.enderecoCadastro.complementoEndereco}" />
+
+							<p:outputLabel value="Bairro:" />
+							<p:inputText maxlength="45" size="35"
+								value="#{enderecoBean.enderecoCadastro.bairroEndereco}">
+								<f:validateBean />
+							</p:inputText>
+
+							<p:outputLabel value="CEP:" />
+							<p:inputMask size="25" mask="99.999-999"
+								value="#{enderecoBean.enderecoCadastro.cepEndereco}">
+								<f:validateBean />
+							</p:inputMask>
+												
+							<p:outputLabel value="Estado:" />
+							<p:selectOneMenu id="slcUnidEstCad1"
+								value="#{enderecoBean.enderecoCadastro.cidade.estado}"
+								converter="estadoConverter" filter="true">
+								<p:ajax event="change" listener="#{enderecoBean.listaCidadesPorEstado}" 
+									update=":frmDlgCampCad:acordPanelCampCad:slcUnidCidCad1"/>
+									
+									
+								<f:selectItem itemValue="" itemLabel="Selecione Estado" />
+								<f:selectItems value="#{enderecoBean.listaEstados}"
+									var="listaEstados" itemValue="#{listaEstados}"
+									itemLabel="#{listaEstados.ufEstado}" />
+								<f:validateBean />
+							</p:selectOneMenu>							
+
+							<p:outputLabel value="Cidade:" />
+							<p:selectOneMenu id="slcUnidCidCad1"
+								value="#{enderecoBean.enderecoCadastro.cidade}"
+								converter="cidadeConverter" filter="true">
+								<p:ajax event="change" listener="#{enderecoBean.listaCidadesPorEstado}"
+									process="slcUnidCidCad1"/>
+								<f:selectItem itemValue="" itemLabel="Selecione Cidade" />
+								<f:selectItems value="#{enderecoBean.listaCidades}"
+									var="listaCidades" itemValue="#{listaCidades}"
+									itemLabel="#{listaCidades.nomeCidade}" />
+								<f:validateBean />
+							</p:selectOneMenu>
+
+						</h:panelGrid>
+
+						<h:panelGrid columns="3" cellpadding="3" cellspacing="10">
+							<p:commandButton value="Salvar" actionListener="#{enderecoBean.executaSalvarEndCamp}"
+										update=":msgAviso :frmUnidCad:tblUnidCad" />
+										
+							<p:commandButton value="Fechar" oncomplete="PF('dlgCampMostrar').hide()"/>
+						</h:panelGrid>
+					</p:tab>
+				</p:accordionPanel>
+			</h:form>	
+		</p:dialog>
+
+	</ui:define>
+</ui:composition>
+
+</html>

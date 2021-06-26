@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition template="/templates/layoutGeral.xhtml">
+
+<ui:define name="conteudo">	
+	<h:form>
+		<p:toolbar>
+			<f:facet name="left">
+				<p:outputLabel value="Tema Selecionado: #{preferenciaThemas.thema}"/>
+			</f:facet>
+		</p:toolbar>
+ 
+	 <p:separator/> 
+      
+    <p:menu widgetVar="themaMenu" position="dynamic" trigger="themaButton" my="left top" at="left bottom"  
+            styleClass="themaMenu">  
+              
+            <p:submenu  label="Temas do Sistema">  
+                  
+                <p:menuitem value="Padrão" ajax="false">  
+                    <f:setPropertyActionListener value="aristo" target="#{preferenciaThemas.thema}" />  
+                </p:menuitem>  
+                  
+                <p:menuitem value="Black-Tie" ajax="false">  
+                    <f:setPropertyActionListener value="black-tie" target="#{preferenciaThemas.thema}" />  
+                </p:menuitem>  
+                  
+                <p:menuitem value="Blitzer" ajax="false">  
+                    <f:setPropertyActionListener value="blitzer" target="#{preferenciaThemas.thema}" />  
+                </p:menuitem>  
+                  
+                <p:menuitem value="Bluesky" ajax="false">  
+                    <f:setPropertyActionListener value="bluesky" target="#{preferenciaThemas.thema}" />  
+                </p:menuitem>  
+                  
+                <p:menuitem value="Casablanca" ajax="false">  
+                    <f:setPropertyActionListener value="casablanca" target="#{preferenciaThemas.thema}" />  
+                </p:menuitem>  
+                  
+                <p:menuitem value="Cupertino" ajax="false">  
+                    <f:setPropertyActionListener value="cupertino" target="#{preferenciaThemas.thema}" />  
+                </p:menuitem>  
+                  
+                <p:menuitem value="Dark-Hive" ajax="false">  
+                    <f:setPropertyActionListener value="dark-hive" target="#{preferenciaThemas.thema}" />  
+                </p:menuitem>  
+                  
+                <p:menuitem value="Dot-Luv" ajax="false">  
+                    <f:setPropertyActionListener value="dot-luv" target="#{preferenciaThemas.thema}" />  
+                </p:menuitem>  
+                  
+                <p:menuitem value="Eggplant" ajax="false">  
+                    <f:setPropertyActionListener value="eggplant" target="#{preferenciaThemas.thema}" />  
+                </p:menuitem>  
+                  
+                <p:menuitem value="Excite-Bike" ajax="false">  
+                    <f:setPropertyActionListener value="excite-bike" target="#{preferenciaThemas.thema}" />  
+                </p:menuitem>  
+                  
+                <p:menuitem value="Flick" ajax="false">  
+                    <f:setPropertyActionListener value="flick" target="#{preferenciaThemas.thema}" />  
+                </p:menuitem>  
+                  
+                <p:menuitem value="Humanity" ajax="false">  
+                    <f:setPropertyActionListener value="humanity" target="#{preferenciaThemas.thema}" />  
+                </p:menuitem>  
+                  
+                <p:menuitem value="Le-Frog" ajax="false">  
+                    <f:setPropertyActionListener value="le-frog" target="#{preferenciaThemas.thema}" />  
+                </p:menuitem>  
+                  
+                <p:menuitem value="Midnight" ajax="false">  
+                    <f:setPropertyActionListener value="midnight" target="#{preferenciaThemas.thema}" />  
+                </p:menuitem>  
+                  
+                <p:menuitem value="Mint-Choc" ajax="false">  
+                    <f:setPropertyActionListener value="mint-choc" target="#{preferenciaThemas.thema}" />  
+                </p:menuitem>  
+                  
+                <p:menuitem value="Overcast" ajax="false">  
+                    <f:setPropertyActionListener value="overcast" target="#{preferenciaThemas.thema}" />  
+                </p:menuitem>  
+                  
+                <p:menuitem value="Pepper-Grinder" ajax="false">  
+                    <f:setPropertyActionListener value="pepper-grinder" target="#{preferenciaThemas.thema}" />  
+                </p:menuitem>  
+                  
+                <p:menuitem value="Redmond" ajax="false">  
+                    <f:setPropertyActionListener value="redmond" target="#{preferenciaThemas.thema}" />  
+                </p:menuitem>  
+                  
+                <p:menuitem value="Rocket" ajax="false">  
+                    <f:setPropertyActionListener value="rocket" target="#{preferenciaThemas.thema}" />  
+                </p:menuitem>  
+                  
+                <p:menuitem value="Smoothness" ajax="false">  
+                    <f:setPropertyActionListener value="smoothness" target="#{preferenciaThemas.thema}" />  
+                </p:menuitem>  
+                  
+                <p:menuitem value="Start" ajax="false">  
+                    <f:setPropertyActionListener value="start" target="#{preferenciaThemas.thema}" />  
+                </p:menuitem>  
+                  
+                <p:menuitem value="Sunny" ajax="false">  
+                    <f:setPropertyActionListener value="sunny" target="#{preferenciaThemas.thema}" />  
+                </p:menuitem>  
+                  
+                <p:menuitem value="Swanky-Purse" ajax="false">  
+                    <f:setPropertyActionListener value="swanky-purse" target="#{preferenciaThemas.thema}" />  
+                </p:menuitem>  
+                  
+                <p:menuitem value="Trontastic" ajax="false">  
+                    <f:setPropertyActionListener value="trontastic" target="#{preferenciaThemas.thema}" />  
+                </p:menuitem>  
+                  
+                <p:menuitem value="UI-Darkness" ajax="false">  
+                    <f:setPropertyActionListener value="ui-darkness" target="#{preferenciaThemas.thema}" />  
+                </p:menuitem>  
+                  
+                <p:menuitem value="UI-Lightness" ajax="false">  
+                    <f:setPropertyActionListener value="ui-lightness" target="#{preferenciaThemas.thema}" />  
+                </p:menuitem>  
+                  
+                <p:menuitem value="Vader" ajax="false">  
+                    <f:setPropertyActionListener value="vader" target="#{preferenciaThemas.thema}" />  
+                </p:menuitem>  
+            </p:submenu>  
+    </p:menu>   
+
+
+	</h:form>
+</ui:define>
+
+</ui:composition>
+</html>
